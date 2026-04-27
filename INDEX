@@ -1,0 +1,282 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TJC Business OS v4</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+--navy:#1B2A4A;
+--bg:#F4F6FA;
+--card:#fff;
+--border:#E2E6F0;
+--text:#1a1f2e;
+--teal:#2A7F7F;
+}
+
+body{margin:0;font-family:Outfit;background:var(--bg);color:var(--text)}
+.app{display:flex;height:100vh}
+
+/* Sidebar */
+.sidebar{
+width:220px;
+background:var(--navy);
+color:#fff;
+padding:15px;
+}
+.sidebar h2{font-size:16px;margin-bottom:20px}
+.nav{padding:8px;cursor:pointer;border-radius:6px}
+.nav:hover{background:rgba(255,255,255,.1)}
+
+/* Main */
+.main{flex:1;display:flex;flex-direction:column}
+.topbar{
+height:50px;
+background:#fff;
+display:flex;
+align-items:center;
+padding:0 15px;
+border-bottom:1px solid var(--border);
+font-weight:600;
+}
+.content{padding:20px;overflow:auto}
+
+/* Cards */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card{background:var(--card);padding:16px;border-radius:10px;border:1px solid var(--border)}
+.title{font-size:12px;color:#777}
+.value{font-size:22px;font-weight:700}
+
+/* Tables */
+table{width:100%;border-collapse:collapse;margin-top:20px}
+th,td{padding:10px;border-bottom:1px solid #eee}
+
+/* Buttons */
+.btn{background:var(--navy);color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer}
+.btn-danger{background:#A32D2D;color:#fff}
+
+/* Modal */
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.4);
+align-items:center;
+justify-content:center;
+}
+.modal-box{
+background:#fff;
+padding:20px;
+border-radius:10px;
+width:320px;
+}
+input{width:100%;padding:8px;margin-bottom:8px;border:1px solid #ddd;border-radius:6px}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<div class="sidebar">
+<h2>TJC OS</h2>
+<div class="nav" onclick="view='dashboard';render()">Dashboard</div>
+<div class="nav" onclick="view='clients';render()">Clients</div>
+<div class="nav" onclick="view='va';render()">VA</div>
+</div>
+
+<div class="main">
+
+<div class="topbar">TJC Business OS</div>
+
+<div class="content" id="content"></div>
+
+</div>
+
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+<div class="modal-box" id="modalBox"></div>
+</div>
+
+<script>
+
+/* ===============================
+   STATE
+================================ */
+let FX = 56;
+
+let DB = JSON.parse(localStorage.getItem("TJC_DB") || `{
+  "clients":[],
+  "vas":[]
+}`);
+
+let view = "dashboard";
+
+/* ===============================
+   UTIL
+================================ */
+function save(){
+localStorage.setItem("TJC_DB", JSON.stringify(DB));
+}
+
+/* ===============================
+   DASHBOARD
+================================ */
+function dashboardHTML(){
+
+let revenue=0, cost=0;
+
+DB.clients.forEach(c=>{
+revenue += c.rate;
+cost += (c.salary/FX);
+});
+
+let profit = revenue - cost;
+
+return `
+<div class="grid">
+<div class="card"><div class="title">Revenue</div><div class="value">$${revenue.toFixed(2)}</div></div>
+<div class="card"><div class="title">Cost</div><div class="value">$${cost.toFixed(2)}</div></div>
+<div class="card"><div class="title">Profit</div><div class="value">$${profit.toFixed(2)}</div></div>
+</div>
+`;
+}
+
+/* ===============================
+   CLIENTS
+================================ */
+function clientsHTML(){
+
+let rows = DB.clients.map((c,i)=>{
+let profit = (c.rate*FX - c.salary)/FX;
+return `
+<tr>
+<td>${c.name}</td>
+<td>$${c.rate}</td>
+<td>₱${c.salary}</td>
+<td>$${profit.toFixed(2)}</td>
+<td>
+<button class="btn-danger" onclick="deleteClient(${i})">Delete</button>
+</td>
+</tr>`;
+}).join("");
+
+return `
+<h3>Clients</h3>
+<button class="btn" onclick="openClientModal()">+ Add Client</button>
+
+<table>
+<tr><th>Name</th><th>Rate</th><th>Salary</th><th>Profit</th><th></th></tr>
+${rows}
+</table>
+`;
+}
+
+function openClientModal(){
+document.getElementById("modal").style.display="flex";
+document.getElementById("modalBox").innerHTML=`
+<h3>Add Client</h3>
+<input id="cname" placeholder="Name">
+<input id="crate" placeholder="Rate USD">
+<input id="csalary" placeholder="Salary PHP">
+<button class="btn" onclick="addClient()">Save</button>
+`;
+}
+
+function addClient(){
+DB.clients.push({
+name: cname.value,
+rate: parseFloat(crate.value),
+salary: parseFloat(csalary.value)
+});
+save(); closeModal(); render();
+}
+
+function deleteClient(i){
+DB.clients.splice(i,1);
+save(); render();
+}
+
+/* ===============================
+   VA SYSTEM
+================================ */
+function vaHTML(){
+
+let rows = DB.vas.map((v,i)=>{
+return `
+<tr>
+<td>${v.name}</td>
+<td>₱${v.salary}</td>
+<td><button class="btn-danger" onclick="deleteVA(${i})">Delete</button></td>
+</tr>`;
+}).join("");
+
+return `
+<h3>Virtual Assistants</h3>
+<button class="btn" onclick="openVAModal()">+ Add VA</button>
+
+<table>
+<tr><th>Name</th><th>Salary</th><th></th></tr>
+${rows}
+</table>
+`;
+}
+
+function openVAModal(){
+modal.style.display="flex";
+modalBox.innerHTML=`
+<h3>Add VA</h3>
+<input id="vname">
+<input id="vsalary">
+<button class="btn" onclick="addVA()">Save</button>
+`;
+}
+
+function addVA(){
+DB.vas.push({
+name:vname.value,
+salary:parseFloat(vsalary.value)
+});
+save(); closeModal(); render();
+}
+
+function deleteVA(i){
+DB.vas.splice(i,1);
+save(); render();
+}
+
+/* ===============================
+   CORE RENDER
+================================ */
+function render(){
+
+let html="";
+
+if(view==="dashboard") html=dashboardHTML();
+if(view==="clients") html=clientsHTML();
+if(view==="va") html=vaHTML();
+
+content.innerHTML = html;
+}
+
+/* ===============================
+   MODAL
+================================ */
+function closeModal(){
+modal.style.display="none";
+}
+
+/* INIT */
+render();
+
+</script>
+
+</body>
+</html>
+```
