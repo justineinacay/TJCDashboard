@@ -346,7 +346,7 @@ select.form-control{cursor:pointer}
 .pin-dot.filled{background:var(--navy);border-color:var(--navy)}
 .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;max-width:200px;margin:0 auto 14px}
 .pin-key{padding:12px;border-radius:var(--r);border:1px solid var(--border2);background:var(--surface);font-size:16px;font-weight:600;cursor:pointer;transition:all .15s;font-family:var(--font)}
-.pin-key:hover{background:var(--navy-pale);aborder-color:var(--navy-mid)}
+.pin-key:hover{background:var(--navy-pale);border-color:var(--navy-mid)}
 .pin-key:active{background:var(--navy);color:#fff;transform:scale(.95)}
 
 /* ── INFO BOXES ──────────────────────────────────────── */
@@ -789,15 +789,17 @@ const KPI = {
     if(score >= 75) return 'Cornerstone';
     if(score >= 60) return 'Waypoint';
     return 'At Risk';
-  },
+  }
+};
 
   tierClass(score){
     if(score >= 90) return 'tier-vanguard';
     if(score >= 75) return 'tier-cornerstone';
     if(score >= 60) return 'tier-waypoint';
     return 'tier-waypoint';
-  },
-
+  }
+};
+      
   tierColor(score){
     if(score >= 90) return 'var(--gold)';
     if(score >= 75) return 'var(--teal)';
@@ -3528,15 +3530,12 @@ function resetData(){
 /* ──────────────────────────────────────────────────────────
    SECTION 33 — KEYBOARD SHORTCUTS
 ────────────────────────────────────────────────────────── */
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape') closeModal();
-  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openQuickAdd();}
-  if((e.metaKey||e.ctrlKey)&&e.key==='t'){e.preventDefault();openAddTask();}
-});
-
 document.addEventListener('DOMContentLoaded', () => {
   loadAllData();
-  APP.profile = APP.data.team.find(u => u.id === APP.user.uid) || APP.data.team[0];
+
+  APP.profile = APP.data.team.find(u => u.id === APP.user.uid) 
+    || APP.data.team[0];
+
   renderCurrentPage();
   updateSbBadges();
 });
