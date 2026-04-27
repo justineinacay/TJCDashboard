@@ -473,6 +473,49 @@ select.form-control{cursor:pointer}
 <div class="toast" id="toast"></div>
 
 <script>
+   function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-overlay').classList.toggle('show');
+}
+
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+
+function openModal(title, bodyHTML, footerHTML=''){
+  document.getElementById('modal-title').innerHTML = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  document.getElementById('modal-foot').innerHTML = footerHTML;
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(){
+  document.getElementById('modal-overlay').classList.remove('open');
+}
+
+function closeModalOutside(e){
+  if(e.target.id === 'modal-overlay') closeModal();
+}
+
+function toast(msg, type='info'){
+  const el = document.getElementById('toast');
+  el.innerText = msg;
+  el.className = 'toast show ' + type;
+
+  setTimeout(()=>{
+    el.classList.remove('show');
+  }, 3000);
+}
+   document.addEventListener('DOMContentLoaded', () => {
+  loadAllData();
+  APP.profile = APP.data.team.find(u => u.id === APP.user.uid);
+
+  renderCurrentPage();   // ✅ YES (needed)
+  updateSbBadges();      // ✅ YES (needed)
+});
+
+
 'use strict';
 /* ════════════════════════════════════════════════════════════
    TJC BUSINESS OS — v3.0
@@ -766,8 +809,15 @@ const CAP = {
 ────────────────────────────────────────────────────────── */
 const KPI = {
   score(va){
-    if(!va.kpi) return 0;
-    const {completionRate=0,slaCompliance=0,errorRate=0,satisfaction=0} = va.kpi;
+    if(!va?.kpi) return 0;
+
+    const {
+      completionRate = 0,
+      slaCompliance = 0,
+      errorRate = 0,
+      satisfaction = 0
+    } = va.kpi;
+
     return Math.round(
       completionRate * 0.40 +
       slaCompliance  * 0.35 +
@@ -775,20 +825,26 @@ const KPI = {
       (satisfaction / 5) * 100 * 0.10
     );
   },
+
   tier(score){
-    if(score>=90) return 'Vanguard';
-    if(score>=75) return 'Cornerstone';
-    return 'Waypoint';
+    if(score >= 90) return 'Vanguard';
+    if(score >= 75) return 'Cornerstone';
+    if(score >= 60) return 'Waypoint';
+    return 'At Risk';
   },
+
   tierClass(score){
-    if(score>=90) return 'tier-vanguard';
-    if(score>=75) return 'tier-cornerstone';
+    if(score >= 90) return 'tier-vanguard';
+    if(score >= 75) return 'tier-cornerstone';
+    if(score >= 60) return 'tier-waypoint';
     return 'tier-waypoint';
   },
+
   tierColor(score){
-    if(score>=90) return 'var(--gold)';
-    if(score>=75) return 'var(--teal)';
-    return 'var(--navy)';
+    if(score >= 90) return 'var(--gold)';
+    if(score >= 75) return 'var(--teal)';
+    if(score >= 60) return 'var(--navy)';
+    return 'var(--red)';
   }
 };
 
