@@ -584,6 +584,38 @@ html,body{font-size:13px}
 /* Subtle stripe on alternating table rows */
 .data-table tbody tr:nth-child(even) td{background:#FAFBFD}
 .data-table tbody tr:nth-child(even):hover td{background:var(--navy-pale)}
+/* ── AUTH / PORTAL MODES ──────────────────────────────────────────── */
+#app-shell.auth-mode .sidebar,
+#app-shell.auth-mode .topbar,
+#app-shell.auth-mode .bottom-nav{display:none!important}
+#app-shell.auth-mode .content-area{padding:0;overflow-y:auto}
+#app-shell.auth-mode .main-area{overflow:auto;height:100vh}
+#app-shell.client-mode .sidebar,
+#app-shell.client-mode .topbar,
+#app-shell.client-mode .bottom-nav{display:none!important}
+#app-shell.client-mode .content-area{padding:0}
+#app-shell.client-mode .main-area{overflow:auto;height:100vh}
+.auth-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--navy) 0%,#1B3A5C 50%,#1a4a4a 100%);padding:24px}
+.auth-card{background:var(--surface);border-radius:var(--r3);padding:36px 32px;width:100%;max-width:420px;box-shadow:var(--shadow2);text-align:center}
+.auth-logo{width:52px;height:52px;border-radius:14px;background:var(--navy);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.auth-title{font-size:22px;font-weight:700;color:var(--navy);margin-bottom:6px}
+.auth-sub{font-size:13px;color:var(--text3);margin-bottom:28px}
+.auth-role-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px}
+.auth-role-btn{display:flex;flex-direction:column;align-items:center;gap:8px;padding:18px 10px;border-radius:var(--r2);border:2px solid var(--border2);cursor:pointer;transition:all .15s;background:var(--bg)}
+.auth-role-btn:hover{border-color:var(--teal);background:var(--teal-pale);transform:translateY(-2px);box-shadow:var(--shadow)}
+.auth-role-icon{font-size:26px}
+.auth-role-label{font-size:12px;font-weight:600;color:var(--text2)}
+.auth-role-sub{font-size:10px;color:var(--text3);text-align:center}
+/* Client portal */
+.cp-topbar{background:var(--navy);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.cp-portal-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;background:var(--surface);padding:0 20px}
+.cp-portal-body{overflow-y:auto;padding:20px;flex:1}
+.cp-welcome{background:linear-gradient(135deg,var(--navy),var(--navy2));border-radius:var(--r2);padding:24px 28px;margin-bottom:20px;color:#fff;position:relative;overflow:hidden}
+.cp-welcome::after{content:'TJC';position:absolute;right:-10px;bottom:-20px;font-size:100px;font-weight:900;color:rgba(255,255,255,.04);pointer-events:none}
+.cp-stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:20px}
+.cp-stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px;text-align:center}
+.cp-stat-val{font-size:26px;font-weight:700;color:var(--navy);line-height:1}
+.cp-stat-lbl{font-size:11px;color:var(--text3);margin-top:4px;text-transform:uppercase;letter-spacing:.04em}
 /* ── END POLISH ───────────────────────────────────────────────────── */
 </style>
 </head>
@@ -650,6 +682,7 @@ const CFG = {
   slaHours: 4,
   capacityWarn: 80,
   capacityMax: 100,
+  ownerPin: '0000',
   appVersion: '3.0',
   currency: { usd: 'USD', php: 'PHP', usdSymbol: '$', phpSymbol: '₱' }
 };
@@ -664,12 +697,12 @@ const SEED = {
     {id:'u5',displayName:'Grace Santos',email:'grace@thejobscollective.com',role:'va',initials:'GS',avatarColor:'green',capacity:45,status:'Active',skills:['Client Relations','Reporting','Sales'],clientCount:3,pin:'1234',kpi:{completionRate:96,slaCompliance:95,errorRate:2,satisfaction:5}},
   ],
   clients: [
-    {id:'c1',name:'BrandX Philippines',status:'Active',package:'Premium',rateUsd:500,vaCostPhp:18000,priority:'High',assignedVaUid:'u2',assignedVa:'Maria Reyes',assignedVaInitials:'MR',assignedVaColor:'teal',lastContact:'2025-04-22',contractEnd:'2025-09-30',timezone:'PHT (UTC+8)',healthScore:82,onboardingStep:7,onboardingDone:true,notes:[],deliverables:[],tools:[],socials:{},contacts:[{name:'Kevin Tan',role:'Marketing Manager',email:'kevin@brandx.ph',phone:'+63 917 xxx xxxx',isPrimary:true}],reports:[],oosCount:2,oosValue:150,archived:false,createdAt:'2025-01-15'},
-    {id:'c2',name:'TechStart Manila',status:'Active',package:'Starter',rateUsd:300,vaCostPhp:12000,priority:'Medium',assignedVaUid:'u3',assignedVa:'Ana Cruz',assignedVaInitials:'AC',assignedVaColor:'red',lastContact:'2025-04-20',contractEnd:'2025-06-30',timezone:'PHT (UTC+8)',healthScore:67,onboardingStep:7,onboardingDone:true,notes:[],deliverables:[],tools:[],socials:{},contacts:[],reports:[],oosCount:1,oosValue:80,archived:false,createdAt:'2025-02-01'},
-    {id:'c3',name:'Sunrise Wellness PH',status:'Onboarding',package:'Growth',rateUsd:400,vaCostPhp:15000,priority:'High',assignedVaUid:'u2',assignedVa:'Maria Reyes',assignedVaInitials:'MR',assignedVaColor:'teal',lastContact:'2025-04-21',contractEnd:'2025-10-31',timezone:'PHT (UTC+8)',healthScore:71,onboardingStep:4,onboardingDone:false,notes:[],deliverables:[],tools:[],socials:{},contacts:[],reports:[],oosCount:0,oosValue:0,archived:false,createdAt:'2025-04-15'},
-    {id:'c4',name:'Bloom Beauty Co.',status:'Completed',package:'Custom',rateUsd:250,vaCostPhp:9000,priority:'Low',assignedVaUid:'u5',assignedVa:'Grace Santos',assignedVaInitials:'GS',assignedVaColor:'green',lastContact:'2025-04-10',contractEnd:'2025-04-10',timezone:'PHT (UTC+8)',healthScore:90,onboardingStep:7,onboardingDone:true,notes:[],deliverables:[],tools:[],socials:{},contacts:[],reports:[],oosCount:0,oosValue:0,archived:false,createdAt:'2024-10-01'},
-    {id:'c5',name:'FreshMart PH',status:'Proposal',package:'Premium',rateUsd:500,vaCostPhp:0,priority:'High',assignedVaUid:'u1',assignedVa:'Justine Bautista',assignedVaInitials:'JB',assignedVaColor:'navy',lastContact:'2025-04-20',contractEnd:'',timezone:'PHT (UTC+8)',healthScore:0,onboardingStep:0,onboardingDone:false,notes:[],deliverables:[],tools:[],socials:{},contacts:[],reports:[],oosCount:0,oosValue:0,archived:false,createdAt:'2025-04-10'},
-    {id:'c6',name:'Pacific Foods PH',status:'Lead',package:'Growth',rateUsd:0,vaCostPhp:0,priority:'High',assignedVaUid:'u5',assignedVa:'Grace Santos',assignedVaInitials:'GS',assignedVaColor:'green',lastContact:'2025-04-18',contractEnd:'',timezone:'PHT (UTC+8)',healthScore:0,onboardingStep:0,onboardingDone:false,notes:[],deliverables:[],tools:[],socials:{},contacts:[],reports:[],oosCount:0,oosValue:0,archived:false,createdAt:'2025-04-18'},
+    {id:'c1',name:'BrandX Philippines',clientPin:'1234',status:'Active',package:'Premium',rateUsd:500,vaCostPhp:18000,priority:'High',assignedVaUid:'u2',assignedVa:'Maria Reyes',assignedVaInitials:'MR',assignedVaColor:'teal',lastContact:'2025-04-22',contractEnd:'2025-09-30',timezone:'PHT (UTC+8)',healthScore:82,onboardingStep:7,onboardingDone:true,notes:[],deliverables:[],tools:[],socials:{},contacts:[{name:'Kevin Tan',role:'Marketing Manager',email:'kevin@brandx.ph',phone:'+63 917 xxx xxxx',isPrimary:true}],reports:[],oosCount:2,oosValue:150,archived:false,createdAt:'2025-01-15'},
+    {id:'c2',name:'TechStart Manila',clientPin:'1234',status:'Active',package:'Starter',rateUsd:300,vaCostPhp:12000,priority:'Medium',assignedVaUid:'u3',assignedVa:'Ana Cruz',assignedVaInitials:'AC',assignedVaColor:'red',lastContact:'2025-04-20',contractEnd:'2025-06-30',timezone:'PHT (UTC+8)',healthScore:67,onboardingStep:7,onboardingDone:true,notes:[],deliverables:[],tools:[],socials:{},contacts:[],reports:[],oosCount:1,oosValue:80,archived:false,createdAt:'2025-02-01'},
+    {id:'c3',name:'Sunrise Wellness PH',clientPin:'1234',status:'Onboarding',package:'Growth',rateUsd:400,vaCostPhp:15000,priority:'High',assignedVaUid:'u2',assignedVa:'Maria Reyes',assignedVaInitials:'MR',assignedVaColor:'teal',lastContact:'2025-04-21',contractEnd:'2025-10-31',timezone:'PHT (UTC+8)',healthScore:71,onboardingStep:4,onboardingDone:false,notes:[],deliverables:[],tools:[],socials:{},contacts:[],reports:[],oosCount:0,oosValue:0,archived:false,createdAt:'2025-04-15'},
+    {id:'c4',name:'Bloom Beauty Co.',clientPin:'1234',status:'Completed',package:'Custom',rateUsd:250,vaCostPhp:9000,priority:'Low',assignedVaUid:'u5',assignedVa:'Grace Santos',assignedVaInitials:'GS',assignedVaColor:'green',lastContact:'2025-04-10',contractEnd:'2025-04-10',timezone:'PHT (UTC+8)',healthScore:90,onboardingStep:7,onboardingDone:true,notes:[],deliverables:[],tools:[],socials:{},contacts:[],reports:[],oosCount:0,oosValue:0,archived:false,createdAt:'2024-10-01'},
+    {id:'c5',name:'FreshMart PH',clientPin:'1234',status:'Proposal',package:'Premium',rateUsd:500,vaCostPhp:0,priority:'High',assignedVaUid:'u1',assignedVa:'Justine Bautista',assignedVaInitials:'JB',assignedVaColor:'navy',lastContact:'2025-04-20',contractEnd:'',timezone:'PHT (UTC+8)',healthScore:0,onboardingStep:0,onboardingDone:false,notes:[],deliverables:[],tools:[],socials:{},contacts:[],reports:[],oosCount:0,oosValue:0,archived:false,createdAt:'2025-04-10'},
+    {id:'c6',name:'Pacific Foods PH',clientPin:'1234',status:'Lead',package:'Growth',rateUsd:0,vaCostPhp:0,priority:'High',assignedVaUid:'u5',assignedVa:'Grace Santos',assignedVaInitials:'GS',assignedVaColor:'green',lastContact:'2025-04-18',contractEnd:'',timezone:'PHT (UTC+8)',healthScore:0,onboardingStep:0,onboardingDone:false,notes:[],deliverables:[],tools:[],socials:{},contacts:[],reports:[],oosCount:0,oosValue:0,archived:false,createdAt:'2025-04-18'},
   ],
   tasks: [
     {id:'t1',title:'Schedule BrandX Week 17 — IG + FB posts',done:false,priority:'Urgent',dueDate:'2025-04-23',project:'BrandX Philippines',clientId:'c1',assigneeUid:'u2',assigneeName:'Maria Reyes',assigneeInitials:'MR',assigneeColor:'teal',isOos:false,archived:false,createdAt:'2025-04-23T06:00:00Z',firstResponseAt:null},
@@ -736,8 +769,13 @@ const APP = {
   convActive: 'cv1',
   spView: 'list',
   spCalMonth: null,
+  authMode: null, // null | 'owner' | 'va' | 'client'
+  authStep: 'choose', // 'choose' | 'owner-pin' | 'va-select' | 'va-pin' | 'client-select' | 'client-pin'
+  ownerPinEntry: '',
+  clientAuth: { clientId: null, pinEntry: '' },
   va: { loggedIn:false,vaId:null,pinEntry:'',tab:'dashboard',taskFilter:'open' },
   cp: { clientId:null,tab:'overview' },
+  cpTab: 'overview', // client-facing portal tab
   timer: { running:false,start:null,elapsed:0,iv:null },
   showArchived: false,
 };
@@ -1160,12 +1198,29 @@ function navigate(page, el){
   if(window.innerWidth <= 680) closeSidebar();
 }
 
+function setAppShellMode(mode){
+  const shell = document.getElementById('app-shell');
+  if(shell) shell.className = mode || '';
+}
+
 function renderCurrentPage(){
   const ca = document.getElementById('content-area');
   if(!ca) return;
   if(typeof Chart !== 'undefined'){
     Object.values(Chart.instances||{}).forEach(c=>c.destroy());
   }
+  // Auth gate
+  if(!APP.authMode){
+    setAppShellMode('auth-mode');
+    ca.innerHTML = renderAuthChooser();
+    return;
+  }
+  if(APP.authMode === 'client'){
+    setAppShellMode('client-mode');
+    ca.innerHTML = renderClientFacingPortal();
+    return;
+  }
+  setAppShellMode('');
   const pages = {
     home: renderHome,
     clients: renderClients,
@@ -3732,6 +3787,362 @@ function rotateDailyVerse(){
   if(el) el.textContent = v.text + ' — ' + v.ref;
 }
 
+/* ─────────────────────────────────────────────────────────────────
+   AUTH SYSTEM
+───────────────────────────────────────────────────────────────── */
+function renderAuthChooser(){
+  const step = APP.authStep || 'choose';
+
+  if(step === 'choose'){
+    return `<div class="auth-wrap"><div class="auth-card">
+      <div class="auth-logo"><svg viewBox="0 0 18 18" fill="none" width="24" height="24"><rect x="2" y="2" width="6" height="6" rx="1.2" fill="#C9A84C"/><rect x="10" y="2" width="6" height="6" rx="1.2" fill="rgba(255,255,255,.5)"/><rect x="2" y="10" width="6" height="6" rx="1.2" fill="rgba(255,255,255,.5)"/><rect x="10" y="10" width="6" height="6" rx="1.2" fill="#2A7F7F"/></svg></div>
+      <div class="auth-title">The Jobs Collective</div>
+      <div class="auth-sub">Business OS · Choose how you'd like to sign in</div>
+      <div class="auth-role-grid">
+        <div class="auth-role-btn" onclick="APP.authStep='owner-pin';APP.ownerPinEntry='';renderCurrentPage()">
+          <div class="auth-role-icon">👑</div>
+          <div class="auth-role-label">Management</div>
+          <div class="auth-role-sub">Owner / HR</div>
+        </div>
+        <div class="auth-role-btn" onclick="APP.authStep='va-select';APP.va.vaId=null;APP.va.pinEntry='';renderCurrentPage()">
+          <div class="auth-role-icon">💼</div>
+          <div class="auth-role-label">VA / Staff</div>
+          <div class="auth-role-sub">Virtual Assistant</div>
+        </div>
+        <div class="auth-role-btn" onclick="APP.authStep='client-select';APP.clientAuth.clientId=null;APP.clientAuth.pinEntry='';renderCurrentPage()">
+          <div class="auth-role-icon">🤝</div>
+          <div class="auth-role-label">Client</div>
+          <div class="auth-role-sub">My Portal</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3)">Secure · Role-based access control</div>
+    </div></div>`;
+  }
+
+  if(step === 'owner-pin'){
+    const filled = APP.ownerPinEntry.length;
+    return `<div class="auth-wrap"><div class="auth-card">
+      <div style="font-size:30px;margin-bottom:12px">👑</div>
+      <div class="auth-title">Management Login</div>
+      <div class="auth-sub">Enter your 4-digit PIN to access the full dashboard</div>
+      <div class="pin-row">${[0,1,2,3].map(i=>`<div class="pin-dot${i<filled?' filled':''}" id="opd-${i}"></div>`).join('')}</div>
+      <div class="pin-pad">${[1,2,3,4,5,6,7,8,9,'←',0,'✓'].map(k=>`<button class="pin-key" onclick="ownerPinPress('${k}')">${k}</button>`).join('')}</div>
+      <button class="btn btn-secondary w-full" style="margin-top:8px" onclick="APP.authStep='choose';renderCurrentPage()">← Back</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px">Default PIN: 0000 · Change in Settings</div>
+    </div></div>`;
+  }
+
+  if(step === 'va-select'){
+    const vas = APP.data.team.filter(v=>v.role==='va'||v.role==='ops_va');
+    return `<div class="auth-wrap"><div class="auth-card">
+      <div style="font-size:30px;margin-bottom:12px">💼</div>
+      <div class="auth-title">VA Portal</div>
+      <div class="auth-sub">Select your profile to continue</div>
+      <div class="va-select-grid">${vas.map(v=>`<div class="va-sel-btn" onclick="authSelectVA('${v.id}')"><div class="av av-md ${avColor(v.avatarColor)}">${v.initials}</div><div style="font-size:12px;font-weight:600">${v.displayName.split(' ')[0]}</div><div style="font-size:10px;color:var(--text3)">${v.skills?.[0]||'VA'}</div></div>`).join('')}</div>
+      <button class="btn btn-secondary w-full" onclick="APP.authStep='choose';renderCurrentPage()">← Back</button>
+    </div></div>`;
+  }
+
+  if(step === 'va-pin'){
+    const va = APP.data.team.find(v=>v.id===APP.va.vaId);
+    if(!va){ APP.authStep='va-select'; renderCurrentPage(); return ''; }
+    const filled = APP.va.pinEntry.length;
+    return `<div class="auth-wrap"><div class="auth-card">
+      <div class="av av-lg ${avColor(va.avatarColor)}" style="margin:0 auto 12px">${va.initials}</div>
+      <div class="auth-title">Hi, ${va.displayName.split(' ')[0]}! 👋</div>
+      <div class="auth-sub">Enter your 4-digit PIN</div>
+      <div class="pin-row">${[0,1,2,3].map(i=>`<div class="pin-dot${i<filled?' filled':''}" id="pd-${i}"></div>`).join('')}</div>
+      <div class="pin-pad">${[1,2,3,4,5,6,7,8,9,'←',0,'✓'].map(k=>`<button class="pin-key" onclick="pinPress('${k}')">${k}</button>`).join('')}</div>
+      <button class="btn btn-secondary w-full" style="margin-top:8px" onclick="APP.authStep='va-select';APP.va.pinEntry='';renderCurrentPage()">← Back</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px">Default PIN: 1234</div>
+    </div></div>`;
+  }
+
+  if(step === 'client-select'){
+    const clients = APP.data.clients.filter(c=>!c.archived && ['Active','Onboarding','Completed'].includes(c.status));
+    return `<div class="auth-wrap"><div class="auth-card">
+      <div style="font-size:30px;margin-bottom:12px">🤝</div>
+      <div class="auth-title">Client Portal</div>
+      <div class="auth-sub">Select your company to continue</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;max-height:280px;overflow-y:auto">
+        ${clients.map(c=>`<div class="card card-hover" style="padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="authSelectClient('${c.id}')">
+          <div class="av av-md ${avColor(c.assignedVaColor)}">${c.assignedVaInitials}</div>
+          <div style="flex:1;text-align:left"><div style="font-size:13px;font-weight:600">${c.name}</div><div style="font-size:11px;color:var(--text3)">${c.package} · ${c.status}</div></div>
+          <span style="font-size:11px;color:var(--teal)">→</span>
+        </div>`).join('')}
+      </div>
+      <button class="btn btn-secondary w-full" onclick="APP.authStep='choose';renderCurrentPage()">← Back</button>
+    </div></div>`;
+  }
+
+  if(step === 'client-pin'){
+    const c = APP.data.clients.find(x=>x.id===APP.clientAuth.clientId);
+    if(!c){ APP.authStep='client-select'; renderCurrentPage(); return ''; }
+    const filled = APP.clientAuth.pinEntry.length;
+    return `<div class="auth-wrap"><div class="auth-card">
+      <div class="av av-lg ${avColor(c.assignedVaColor)}" style="margin:0 auto 12px">${c.assignedVaInitials}</div>
+      <div class="auth-title">${c.name}</div>
+      <div class="auth-sub">Enter your 4-digit PIN to access your portal</div>
+      <div class="pin-row">${[0,1,2,3].map(i=>`<div class="pin-dot${i<filled?' filled':''}" id="cpd-${i}"></div>`).join('')}</div>
+      <div class="pin-pad">${[1,2,3,4,5,6,7,8,9,'←',0,'✓'].map(k=>`<button class="pin-key" onclick="clientPinPress('${k}')">${k}</button>`).join('')}</div>
+      <button class="btn btn-secondary w-full" style="margin-top:8px" onclick="APP.authStep='client-select';APP.clientAuth.pinEntry='';renderCurrentPage()">← Back</button>
+      <div style="font-size:11px;color:var(--text3);margin-top:10px">Default PIN: 1234 · Contact TJC to reset</div>
+    </div></div>`;
+  }
+  return '';
+}
+
+// Owner PIN
+function ownerPinPress(k){
+  if(k==='←'){ APP.ownerPinEntry=APP.ownerPinEntry.slice(0,-1); renderCurrentPage(); return; }
+  if(k==='✓'||APP.ownerPinEntry.length>=4){ checkOwnerPin(); return; }
+  APP.ownerPinEntry+=k;
+  renderCurrentPage();
+  if(APP.ownerPinEntry.length===4) setTimeout(checkOwnerPin,180);
+}
+function checkOwnerPin(){
+  if(APP.ownerPinEntry===CFG.ownerPin){
+    APP.authMode='owner'; APP.authStep='choose';
+    buildNav(); buildTopbarActions(); buildBottomNav(); updateUserInfo();
+    navigate('home');
+    toast('Welcome back, Justine! 👑','success');
+  } else {
+    APP.ownerPinEntry=''; renderCurrentPage(); toast('Incorrect PIN.','error');
+  }
+}
+function ownerLogout(){
+  if(!confirm('Sign out of the Management dashboard?')) return;
+  APP.authMode=null; APP.authStep='choose'; APP.ownerPinEntry='';
+  renderCurrentPage();
+}
+
+// VA auth (integrates with existing PIN system)
+function authSelectVA(id){ APP.va.vaId=id; APP.va.pinEntry=''; APP.authStep='va-pin'; renderCurrentPage(); }
+// checkPin() already exists — patch it to set authMode
+const _origCheckPin = typeof checkPin === 'function' ? checkPin : null;
+function checkPin(){
+  const va=APP.data.team.find(v=>v.id===APP.va.vaId);
+  if(APP.va.pinEntry===(va?.pin||'1234')){
+    APP.va.loggedIn=true; APP.va.tab='dashboard'; APP.authMode='va'; APP.authStep='choose';
+    setAppShellMode('');
+    navigate('vaportal');
+    toast('Welcome back, '+va.displayName.split(' ')[0]+'! 👋','success');
+  } else {
+    APP.va.pinEntry=''; renderCurrentPage(); toast('Incorrect PIN.','error');
+  }
+}
+function vaLogout(){
+  APP.va.loggedIn=false; APP.va.vaId=null; APP.va.pinEntry=''; APP.va.tab='dashboard';
+  APP.authMode=null; APP.authStep='choose';
+  if(APP.timer.iv){clearInterval(APP.timer.iv);APP.timer.iv=null;APP.timer.running=false;APP.timer.elapsed=0;}
+  renderCurrentPage();
+}
+
+// Client auth
+function authSelectClient(id){ APP.clientAuth.clientId=id; APP.clientAuth.pinEntry=''; APP.authStep='client-pin'; renderCurrentPage(); }
+function updateClientPinDots(){ const f=APP.clientAuth.pinEntry.length; [0,1,2,3].forEach(i=>{const d=document.getElementById('cpd-'+i); if(d) d.className='pin-dot'+(i<f?' filled':'');}); }
+function clientPinPress(k){
+  if(k==='←'){ APP.clientAuth.pinEntry=APP.clientAuth.pinEntry.slice(0,-1); renderCurrentPage(); return; }
+  if(k==='✓'||APP.clientAuth.pinEntry.length>=4){ checkClientPin(); return; }
+  APP.clientAuth.pinEntry+=k;
+  renderCurrentPage();
+  if(APP.clientAuth.pinEntry.length===4) setTimeout(checkClientPin,180);
+}
+function checkClientPin(){
+  const c=APP.data.clients.find(x=>x.id===APP.clientAuth.clientId);
+  const pin=(c?.clientPin||'1234');
+  if(APP.clientAuth.pinEntry===pin){
+    APP.authMode='client'; APP.authStep='choose'; APP.cpTab='overview';
+    renderCurrentPage();
+    toast('Welcome, '+c.name+'!','success');
+  } else {
+    APP.clientAuth.pinEntry=''; renderCurrentPage(); toast('Incorrect PIN.','error');
+  }
+}
+function clientLogout(){
+  APP.authMode=null; APP.authStep='choose';
+  APP.clientAuth={clientId:null,pinEntry:''};
+  renderCurrentPage();
+}
+function setClientTab(t){ APP.cpTab=t; renderCurrentPage(); }
+
+/* ─────────────────────────────────────────────────────────────────
+   CLIENT-FACING PORTAL (visible only to authenticated clients)
+───────────────────────────────────────────────────────────────── */
+function renderClientFacingPortal(){
+  const c = APP.data.clients.find(x=>x.id===APP.clientAuth.clientId);
+  if(!c){ clientLogout(); return ''; }
+  const myTasks   = APP.data.tasks.filter(t=>t.clientId===c.id&&!t.archived);
+  const myInvs    = APP.data.invoices.filter(i=>i.clientId===c.id&&!i.archived);
+  const myContent = APP.data.content.filter(ct=>ct.clientId===c.id&&!ct.archived&&ct.status==='approved');
+  const openTasks = myTasks.filter(t=>!t.done);
+  const td        = today();
+  const overdue   = myTasks.filter(t=>!t.done&&t.dueDate&&t.dueDate<td);
+  const outstanding = myInvs.filter(i=>['Sent','Overdue'].includes(i.status)).reduce((a,i)=>a+i.amountUsd,0);
+  const h = HEALTH.compute(c);
+
+  const topbar = `<div class="cp-topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="sb-icon"><svg viewBox="0 0 18 18" fill="none" width="16" height="16"><rect x="2" y="2" width="6" height="6" rx="1.2" fill="#C9A84C"/><rect x="10" y="2" width="6" height="6" rx="1.2" fill="rgba(255,255,255,.5)"/><rect x="2" y="10" width="6" height="6" rx="1.2" fill="rgba(255,255,255,.5)"/><rect x="10" y="10" width="6" height="6" rx="1.2" fill="#2A7F7F"/></svg></div>
+      <div><div style="font-size:11px;color:rgba(255,255,255,.5)">Client Portal</div><div style="font-size:14px;font-weight:700;color:#fff">${c.name}</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="av av-sm ${avColor(c.assignedVaColor)}">${c.assignedVaInitials}</div>
+      <span style="font-size:12px;color:rgba(255,255,255,.6)">${c.assignedVa}</span>
+      <button class="btn btn-sm" style="background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.2);color:#fff" onclick="clientLogout()">Sign Out</button>
+    </div>
+  </div>`;
+
+  const tabs = [['overview','📊 Overview'],['tasks','✅ My Tasks'],['invoices','🧾 Invoices'],['content','📱 Deliverables'],['contact','📞 Contact Us']];
+  const tabBar = `<div class="cp-portal-tabs">${tabs.map(([t,l])=>`<div class="ptab${APP.cpTab===t?' on':''}" onclick="setClientTab('${t}')">${l}</div>`).join('')}</div>`;
+
+  let body = '';
+  if(APP.cpTab==='overview'){
+    body = `
+    <div class="cp-welcome">
+      <div style="font-size:11px;color:rgba(255,255,255,.55);margin-bottom:4px">${c.package} Package · ${c.assignedVa}</div>
+      <div style="font-size:22px;font-weight:700;margin-bottom:4px">Welcome back, ${c.name}! 👋</div>
+      <div style="font-size:13px;color:rgba(255,255,255,.65)">Contract: ${c.contractEnd||'Ongoing'} · Time Zone: ${c.timezone||'PHT'}</div>
+    </div>
+    <div class="cp-stat-grid">
+      <div class="cp-stat"><div class="cp-stat-val" style="color:${openTasks.length?'var(--navy)':'var(--green)'}">${openTasks.length}</div><div class="cp-stat-lbl">Open Tasks</div></div>
+      <div class="cp-stat"><div class="cp-stat-val" style="color:${overdue.length?'var(--red)':'var(--green)'}">${overdue.length}</div><div class="cp-stat-lbl">Overdue</div></div>
+      <div class="cp-stat"><div class="cp-stat-val" style="color:${outstanding?'var(--amber)':'var(--green)'}">$${outstanding.toLocaleString()}</div><div class="cp-stat-lbl">Outstanding</div></div>
+      <div class="cp-stat"><div class="cp-stat-val">${h||'—'}</div><div class="cp-stat-lbl">Health Score</div></div>
+    </div>
+    <div class="sec-head"><div class="sec-title">My Open Tasks</div></div>
+    <div class="card" style="margin-bottom:20px">
+      ${openTasks.slice(0,8).map(t=>`<div class="task-row${t.dueDate&&t.dueDate<td?' overdue-row':''}">
+        <div class="chk${t.done?' done':''}"></div>
+        <span class="task-name">${t.title}</span>
+        <div class="task-meta">${t.dueDate?`<span style="font-size:11px;color:${t.dueDate<td?'var(--red)':'var(--text3)'}">${t.dueDate}</span>`:''}</div>
+      </div>`).join('')||'<div class="empty"><div class="empty-text">No open tasks 🎉</div></div>'}
+    </div>
+    <div class="sec-head"><div class="sec-title">Recent Invoices</div></div>
+    <div class="card">
+      ${myInvs.slice(0,5).map(inv=>`<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)">
+        <span style="font-size:11px;color:var(--text3);min-width:80px">${inv.number}</span>
+        <span class="tag ${invoiceTag(inv.status)}">${inv.status}</span>
+        <span style="flex:1;font-size:11px;color:var(--text3)">${inv.dueDate||'—'}</span>
+        <span style="font-weight:700;color:var(--navy)">$${inv.amountUsd.toLocaleString()}</span>
+      </div>`).join('')||'<div class="empty"><div class="empty-text">No invoices yet</div></div>'}
+    </div>`;
+  }
+
+  if(APP.cpTab==='tasks'){
+    body = `
+    <div class="sec-head"><div class="sec-title">All My Tasks</div><div style="display:flex;gap:6px"><span class="tag t-red">${overdue.length} overdue</span><span class="tag t-navy">${openTasks.length} open</span><span class="tag t-green">${myTasks.filter(t=>t.done).length} done</span></div></div>
+    <div class="card">
+      ${myTasks.length ? myTasks.map(t=>`<div class="task-row${t.dueDate&&t.dueDate<td&&!t.done?' overdue-row':''}">
+        <div class="chk${t.done?' done':''}"></div>
+        <span class="task-name${t.done?' done':''}">${t.title}</span>
+        <div class="task-meta">
+          ${t.dueDate?`<span style="font-size:11px;color:${t.dueDate<td&&!t.done?'var(--red)':'var(--text3)'}">${t.dueDate}</span>`:''}
+          ${t.done?'<span class="tag t-green" style="font-size:10px">Done</span>':''}
+        </div>
+      </div>`).join('') : '<div class="empty"><div class="empty-text">No tasks assigned to your account</div></div>'}
+    </div>`;
+  }
+
+  if(APP.cpTab==='invoices'){
+    const paidTotal = myInvs.filter(i=>i.status==='Paid').reduce((a,i)=>a+i.amountUsd,0);
+    body = `
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px">
+      <div class="cp-stat"><div class="cp-stat-val">${myInvs.length}</div><div class="cp-stat-lbl">Total Invoices</div></div>
+      <div class="cp-stat"><div class="cp-stat-val" style="color:var(--green)">$${paidTotal.toLocaleString()}</div><div class="cp-stat-lbl">Total Paid</div></div>
+      <div class="cp-stat"><div class="cp-stat-val" style="color:${outstanding?'var(--amber)':'var(--green)'}">$${outstanding.toLocaleString()}</div><div class="cp-stat-lbl">Outstanding</div></div>
+    </div>
+    <div class="card">
+      ${myInvs.length ? myInvs.map(inv=>`<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border)">
+        <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600">${inv.number}</div><div style="font-size:11px;color:var(--text3)">Due: ${inv.dueDate||'—'}</div></div>
+        <span class="tag ${invoiceTag(inv.status)}">${inv.status}</span>
+        <div style="text-align:right"><div style="font-weight:700;color:var(--navy);font-size:15px">$${inv.amountUsd.toLocaleString()}</div><div style="font-size:11px;color:var(--text3)">₱${FIN.toPhp(inv.amountUsd).toLocaleString()}</div></div>
+      </div>`).join('') : '<div class="empty"><div class="empty-text">No invoices on file</div></div>'}
+    </div>`;
+  }
+
+  if(APP.cpTab==='content'){
+    body = `
+    <div class="sec-head"><div class="sec-title">Approved Deliverables</div><span class="tag t-green">${myContent.length} approved</span></div>
+    <div class="card">
+      ${myContent.length ? myContent.map(ct=>{
+        const plats=postPlatforms(ct);
+        const imgUrl=drivePreviewUrl(ct.imageUrl);
+        return `<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border)">
+          ${imgUrl?`<img src="${imgUrl}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--border)" onerror="this.style.display='none'">`:`<div style="width:44px;height:44px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:18px">📄</div>`}
+          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ct.title}</div><div style="font-size:11px;color:var(--text3)">${plats.map(p=>platIcon(p)).join(' ')} ${ct.scheduleDate||ct.dueLabel||'—'}</div></div>
+          <span class="tag t-green">Approved</span>
+        </div>`;}).join('') : '<div class="empty"><div class="empty-text">No approved deliverables yet — check back soon!</div></div>'}
+    </div>`;
+  }
+
+  if(APP.cpTab==='contact'){
+    body = `
+    <div class="card card-pad" style="margin-bottom:14px;max-width:480px">
+      <div style="font-size:15px;font-weight:700;margin-bottom:14px;color:var(--navy)">Your TJC Team</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+        <div class="av av-lg av-gold">JI</div>
+        <div><div style="font-size:13px;font-weight:600">Justine Inacay</div><div style="font-size:11px;color:var(--text3)">Founder · The Jobs Collective</div><div style="font-size:11px;color:var(--teal);margin-top:2px">justine@thejobscollective.com</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="av av-lg ${avColor(c.assignedVaColor)}">${c.assignedVaInitials}</div>
+        <div><div style="font-size:13px;font-weight:600">${c.assignedVa}</div><div style="font-size:11px;color:var(--text3)">Your Assigned VA</div></div>
+      </div>
+    </div>
+    <div class="card card-pad" style="max-width:480px">
+      <div style="font-size:13px;font-weight:600;margin-bottom:10px;color:var(--navy)">Need Help?</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.8">
+        📧 <strong>Email:</strong> hello@thejobscollective.com<br>
+        💬 <strong>Response time:</strong> Within 24 hours on business days<br>
+        🕐 <strong>Office hours:</strong> Mon–Fri, 8 AM – 6 PM PHT<br>
+        📦 <strong>Your package:</strong> ${c.package}
+      </div>
+    </div>`;
+  }
+
+  return `<div style="display:flex;flex-direction:column;height:100vh;overflow:hidden">${topbar}${tabBar}<div class="cp-portal-body">${body}</div></div>`;
+}
+
+/* ── OWNER PIN CHANGE ─────────────────────────────────────────── */
+function openChangeOwnerPin(){
+  openModal('Change Owner PIN',`
+    <div class="form-group"><label class="form-label">Current PIN</label><input type="password" class="form-control" id="f-pin-old" maxlength="4" placeholder="••••"></div>
+    <div class="form-group"><label class="form-label">New PIN (4 digits)</label><input type="password" class="form-control" id="f-pin-new" maxlength="4" placeholder="••••"></div>
+    <div class="form-group"><label class="form-label">Confirm New PIN</label><input type="password" class="form-control" id="f-pin-confirm" maxlength="4" placeholder="••••"></div>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveOwnerPin()">Save PIN</button>`
+  );
+}
+function saveOwnerPin(){
+  const old=document.getElementById('f-pin-old').value;
+  const n=document.getElementById('f-pin-new').value;
+  const c=document.getElementById('f-pin-confirm').value;
+  if(old!==CFG.ownerPin){ toast('Current PIN is incorrect.','error'); return; }
+  if(n.length!==4||!/^\d+$/.test(n)){ toast('PIN must be exactly 4 digits.','error'); return; }
+  if(n!==c){ toast('New PINs do not match.','error'); return; }
+  CFG.ownerPin=n;
+  closeModal(); toast('Owner PIN updated successfully!','success');
+}
+
+/* ── CLIENT PIN MANAGEMENT (owner can set per client) ─────────── */
+function openSetClientPin(clientId){
+  const c=APP.data.clients.find(x=>x.id===clientId);
+  if(!c) return;
+  openModal('Set Portal PIN — '+c.name,`
+    <div class="form-group"><label class="form-label">New 4-digit PIN for ${c.name}</label><input type="password" class="form-control" id="f-cp-pin" maxlength="4" placeholder="e.g. 5678"></div>
+    <div class="form-note">The client will use this PIN to log into their portal.</div>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveClientPin('${clientId}')">Set PIN</button>`
+  );
+}
+function saveClientPin(clientId){
+  const c=APP.data.clients.find(x=>x.id===clientId);
+  if(!c) return;
+  const p=document.getElementById('f-cp-pin').value;
+  if(p.length!==4||!/^\d+$/.test(p)){ toast('PIN must be exactly 4 digits.','error'); return; }
+  c.clientPin=p;
+  lsSave('clients',APP.data.clients);
+  closeModal(); toast('Client PIN updated for '+c.name,'success');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadAllData();
   APP.profile = APP.data.team.find(v => v.id === 'u1') || SEED.team[0];
@@ -3743,7 +4154,10 @@ document.addEventListener('DOMContentLoaded', () => {
   updateExchangeRateDisplay();
   rotateDailyVerse();
   fetchLiveExchangeRate();
-  navigate('home');
+  // Start at auth chooser — no one is logged in yet
+  APP.authMode = null;
+  APP.authStep = 'choose';
+  renderCurrentPage();
 });
 </script>
 </body>
