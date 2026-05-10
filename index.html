@@ -377,6 +377,42 @@ select.form-control{cursor:pointer}
 .sp-content-row:hover{background:#FAFBFE}
 .sp-content-row:last-child{border-bottom:none}
 .sp-platform-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.sp-thumb{width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--border);flex-shrink:0;display:block}
+.sp-thumb-placeholder{width:44px;height:44px;border-radius:6px;background:var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+/* Platform checkbox grid */
+.plat-check-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.plat-check{display:flex;align-items:center;gap:5px;padding:6px 8px;border:1.5px solid var(--border2);border-radius:7px;cursor:pointer;font-size:11px;transition:all .12s;user-select:none}
+.plat-check:hover{border-color:var(--teal);background:var(--teal-pale)}
+.plat-check.on{border-color:var(--teal);background:var(--teal-pale);color:var(--teal-dark);font-weight:600}
+.plat-check input[type=checkbox]{width:12px;height:12px;accent-color:var(--teal);cursor:pointer}
+/* Post preview card (in compose form) */
+.sp-preview-card{border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--surface);margin-top:12px}
+.sp-preview-card-head{padding:8px 12px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:var(--bg);font-size:12px;font-weight:600}
+.sp-preview-img{width:100%;max-height:180px;object-fit:cover;background:var(--border);display:block}
+.sp-preview-img-ph{height:120px;background:linear-gradient(135deg,var(--border),var(--bg));display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:24px}
+.sp-preview-body{padding:12px;font-size:12px;line-height:1.6;color:var(--text);min-height:40px;white-space:pre-wrap}
+.sp-preview-plats{padding:8px 12px;border-top:1px solid var(--border);display:flex;gap:4px;flex-wrap:wrap}
+/* Calendar view */
+.sp-cal-wrap{border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--surface)}
+.sp-cal{display:grid;grid-template-columns:repeat(7,1fr)}
+.sp-cal-hdr{padding:7px 4px;text-align:center;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;background:var(--bg);border-bottom:1px solid var(--border)}
+.sp-cal-day{min-height:80px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:5px;background:var(--surface)}
+.sp-cal-day:nth-child(7n){border-right:none}
+.sp-cal-day.other-month{background:var(--bg);opacity:.6}
+.sp-cal-num{font-size:11px;font-weight:600;color:var(--text2);width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;margin-bottom:3px}
+.sp-cal-num.today{background:var(--teal);color:#fff}
+.sp-cal-pill{font-size:9px;padding:2px 5px;border-radius:3px;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer;line-height:1.4}
+.sp-cal-pill.pending{background:var(--red-pale);color:var(--red)}
+.sp-cal-pill.approved{background:var(--green-pale);color:var(--green)}
+.sp-cal-pill.revision{background:var(--amber-pale);color:var(--amber)}
+/* Insights board */
+.insights-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-top:20px}
+.insight-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px;text-align:center}
+.insight-icon{font-size:22px;margin-bottom:5px}
+.insight-name{font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px}
+.insight-stat{font-size:24px;font-weight:700;color:var(--navy);line-height:1}
+.insight-sub{font-size:10px;color:var(--text3);margin-top:3px}
+.insight-pills{display:flex;justify-content:center;gap:4px;margin-top:8px;flex-wrap:wrap}
 /* Conversations */
 /* Conversations — Email style */
 .conv-layout{display:flex;height:calc(100vh - 110px);gap:0;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--surface)}
@@ -570,6 +606,8 @@ const APP = {
   page: 'home',
   data: { tasks:[],clients:[],timelogs:[],content:[],invoices:[],goals:[],team:[],events:[],activities:[],conversations:[] },
   convActive: 'cv1',
+  spView: 'list',
+  spCalMonth: null,
   va: { loggedIn:false,vaId:null,pinEntry:'',tab:'dashboard',taskFilter:'open' },
   cp: { clientId:null,tab:'overview' },
   timer: { running:false,start:null,elapsed:0,iv:null },
@@ -1588,35 +1626,49 @@ function approvalCardHtml(c, isRevision=false){
   return `<div class="card card-pad" id="apv-${c.id}" style="margin-bottom:8px${isRevision?';border-left:3px solid var(--gold)':''}"><div style="font-size:13px;font-weight:600;margin-bottom:4px">${c.title}</div><div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text3);margin-bottom:8px;flex-wrap:wrap"><div class="av av-xs ${avColor(c.vaColor||'navy')}">${c.vaInitials||'?'}</div>${c.vaName} · ${c.platform}<span class="tag ${c.urgency==='red'?'t-red':c.urgency==='amber'?'t-amber':'t-gray'}">${c.dueLabel}</span>${isRevision?`<span class="tag t-amber">Revision Requested</span>`:''}</div><div style="display:flex;gap:5px"><button class="btn btn-xs" style="background:var(--green-pale);color:var(--green);border:1px solid #a7d9bb" onclick="approveContent('${c.id}')">✓ Approve</button><button class="btn btn-xs btn-secondary" onclick="reviseContent('${c.id}')">↩ Revision</button><button class="btn btn-xs btn-secondary" style="margin-left:auto" onclick="archiveDoc('content','${c.id}','${c.title.slice(0,30)}')">🗃</button></div></div>`;
 }
 
+const PLAT_META = {
+  Facebook:    {icon:'🟦', color:'#1877F2'},
+  Instagram:   {icon:'📸', color:'#E1306C'},
+  LinkedIn:    {icon:'🔷', color:'#0A66C2'},
+  TikTok:      {icon:'🎵', color:'#010101'},
+  Threads:     {icon:'🧵', color:'#101010'},
+  'Twitter / X':{icon:'🐦', color:'#1DA1F2'},
+  'Google Business':{icon:'📍', color:'#4285F4'},
+  YouTube:     {icon:'▶️', color:'#FF0000'},
+  Pinterest:   {icon:'📌', color:'#E60023'},
+};
+function platIcon(p){ return (PLAT_META[p]||{icon:'📱'}).icon; }
+function platColor(p){ return (PLAT_META[p]||{color:'var(--navy)'}).color; }
+function postPlatforms(c){ return Array.isArray(c.platforms)&&c.platforms.length ? c.platforms : (c.platform ? [c.platform] : ['Various']); }
+
+function drivePreviewUrl(url){
+  if(!url) return null;
+  const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if(m) return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w400`;
+  const m2 = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if(m2) return `https://drive.google.com/thumbnail?id=${m2[1]}&sz=w400`;
+  if(/\.(jpg|jpeg|png|gif|webp|svg)/i.test(url)) return url;
+  return null;
+}
+
 function renderContent(){
-  const pending = APP.data.content.filter(c=>c.status==='pending'&&!c.archived);
+  const pending  = APP.data.content.filter(c=>c.status==='pending'&&!c.archived);
   const approved = APP.data.content.filter(c=>c.status==='approved'&&!c.archived);
   const revision = APP.data.content.filter(c=>c.status==='revision'&&!c.archived);
   const allContent = APP.data.content.filter(c=>!c.archived);
-  const now = new Date();
-  const dateFrom = new Date(now.getFullYear(), now.getMonth()-6, 1).toISOString().split('T')[0];
-  const dateTo = new Date(now.getFullYear(), now.getMonth()+2, 0).toISOString().split('T')[0];
-  const platformIcons = {'Facebook':'🟦','Instagram':'📸','LinkedIn':'🔷','Twitter':'🐦','TikTok':'🎵','Threads':'🧵','Google Business':'📍','YouTube':'▶️','Pinterest':'📌'};
   const spFilter = APP.spFilter||'all';
-  const filteredContent = spFilter==='all' ? allContent : allContent.filter(c=>c.platform&&c.platform.toLowerCase().includes(spFilter.toLowerCase().split(' /')[0].trim()));
-  return `
+  const filteredContent = spFilter==='all' ? allContent : allContent.filter(c=>postPlatforms(c).some(p=>p.toLowerCase().includes(spFilter.toLowerCase().split(' /')[0].trim())));
+  const view = APP.spView||'list';
+
+  const header = `
   <div class="sp-header">
     <div class="sp-platform-filter" id="sp-filter" style="flex-wrap:wrap;gap:5px">
-      <div class="sp-platform-btn on" onclick="filterSocialPlan(this,'all')">All</div>
-      <div class="sp-platform-btn" onclick="filterSocialPlan(this,'Facebook')">🟦 Facebook</div>
-      <div class="sp-platform-btn" onclick="filterSocialPlan(this,'Instagram')">📸 Instagram</div>
-      <div class="sp-platform-btn" onclick="filterSocialPlan(this,'LinkedIn')">🔷 LinkedIn</div>
-      <div class="sp-platform-btn" onclick="filterSocialPlan(this,'TikTok')">🎵 TikTok</div>
-      <div class="sp-platform-btn" onclick="filterSocialPlan(this,'Threads')">🧵 Threads</div>
-      <div class="sp-platform-btn" onclick="filterSocialPlan(this,'Twitter')">🐦 Twitter / X</div>
-      <div class="sp-platform-btn" onclick="filterSocialPlan(this,'Google Business')">📍 Google Business</div>
-      <div class="sp-platform-btn" onclick="filterSocialPlan(this,'YouTube')">▶️ YouTube</div>
-      <div class="sp-platform-btn" onclick="filterSocialPlan(this,'Pinterest')">📌 Pinterest</div>
+      <div class="sp-platform-btn${spFilter==='all'?' on':''}" onclick="filterSocialPlan(this,'all')">All</div>
+      ${Object.entries(PLAT_META).map(([p,m])=>`<div class="sp-platform-btn${spFilter===p?' on':''}" onclick="filterSocialPlan(this,'${p}')">${m.icon} ${p}</div>`).join('')}
     </div>
-    <div class="sp-date-range">📅 ${dateFrom} → ${dateTo}</div>
     <div class="sp-view-toggle" style="margin-left:auto">
-      <div class="sp-view-btn on">☰ List</div>
-      <div class="sp-view-btn">📅 Calendar</div>
+      <div class="sp-view-btn${view==='list'?' on':''}" onclick="APP.spView='list';renderCurrentPage()">☰ List</div>
+      <div class="sp-view-btn${view==='calendar'?' on':''}" onclick="APP.spView='calendar';renderCurrentPage()">📅 Calendar</div>
     </div>
     <button class="btn btn-sm btn-primary" onclick="openAddContent()">+ New Post</button>
   </div>
@@ -1624,37 +1676,143 @@ function renderContent(){
     <span class="tag t-red">${pending.length} Pending</span>
     <span class="tag t-green">${approved.length} Approved</span>
     <span class="tag t-amber">${revision.length} Revision</span>
-    <span class="tag t-navy">${allContent.length} Total Posts</span>
-  </div>
+    <span class="tag t-navy">${allContent.length} Total</span>
+  </div>`;
+
+  const listView = `
   <div class="card" style="margin-bottom:16px">
-    <div style="padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;gap:10px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">
-      <div style="flex:3">Caption / Title</div>
-      <div style="flex:1">Platform</div>
-      <div style="flex:1">Status</div>
-      <div style="flex:1">Due Date</div>
-      <div style="flex:1">Assigned VA</div>
+    <div style="padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--border);display:grid;grid-template-columns:44px 44px 1fr 140px 90px 90px 110px;gap:10px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;align-items:center">
+      <div></div><div></div><div>Caption / Title</div><div>Platforms</div><div>Status</div><div>Scheduled</div><div>Assigned VA</div>
     </div>
     ${filteredContent.length ? filteredContent.map(c=>{
-      const platIcon = c.platform&&c.platform.includes('TikTok')?'🎵':c.platform&&c.platform.includes('Threads')?'🧵':c.platform&&c.platform.includes('Twitter')?'🐦':c.platform&&c.platform.includes('Instagram')?'📸':c.platform&&c.platform.includes('LinkedIn')?'🔷':c.platform&&c.platform.includes('Google')?'📍':c.platform&&c.platform.includes('YouTube')?'▶️':c.platform&&c.platform.includes('Pinterest')?'📌':'🟦';
+      const plats = postPlatforms(c);
+      const imgUrl = drivePreviewUrl(c.imageUrl);
+      const statusBg = c.status==='pending'?'var(--red-pale)':c.status==='approved'?'var(--green-pale)':'var(--amber-pale)';
       const statusTag2 = c.status==='pending'?'t-red':c.status==='approved'?'t-green':'t-amber';
-      return `<div class="sp-content-row" onclick="${c.status==='pending'?`openApprovalDetail('${c.id}')`:'void(0)'}">
-        <div class="sp-platform-icon" style="background:${c.status==='pending'?'var(--red-pale)':c.status==='approved'?'var(--green-pale)':'var(--amber-pale)'}">${platIcon}</div>
-        <div style="flex:3;min-width:0"><div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.title}</div></div>
-        <div style="flex:1;font-size:11px;color:var(--text3)">${c.platform||'—'}</div>
-        <div style="flex:1"><span class="tag ${statusTag2}" style="font-size:9px">${c.status}</span></div>
-        <div style="flex:1;font-size:11px;color:var(--text3)">${c.dueLabel||'—'}</div>
-        <div style="flex:1;display:flex;align-items:center;gap:5px"><div class="av av-xs ${avColor(c.vaColor||'navy')}">${c.vaInitials}</div><span style="font-size:11px">${c.vaName}</span></div>
+      return `<div class="sp-content-row" style="display:grid;grid-template-columns:44px 44px 1fr 140px 90px 90px 110px;gap:10px;align-items:center" onclick="openPostDetail('${c.id}')">
+        <div class="sp-platform-icon" style="background:${statusBg}">${platIcon(plats[0])}</div>
+        ${imgUrl ? `<img class="sp-thumb" src="${imgUrl}" onerror="this.style.display='none';this.nextSibling.style.display='flex'" alt=""><div class="sp-thumb-placeholder" style="display:none">🖼</div>` : `<div class="sp-thumb-placeholder">🖼</div>`}
+        <div style="min-width:0"><div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.title}</div><div style="font-size:10px;color:var(--text3);margin-top:1px">${c.postType||'Post'}</div></div>
+        <div style="display:flex;gap:3px;flex-wrap:wrap">${plats.slice(0,3).map(p=>`<span style="font-size:11px" title="${p}">${platIcon(p)}</span>`).join('')}${plats.length>3?`<span style="font-size:10px;color:var(--text3)">+${plats.length-3}</span>`:''}</div>
+        <div><span class="tag ${statusTag2}">${c.status}</span></div>
+        <div style="font-size:11px;color:var(--text3)">${c.scheduleDate||c.dueLabel||'—'}</div>
+        <div style="display:flex;align-items:center;gap:5px"><div class="av av-xs ${avColor(c.vaColor||'navy')}">${c.vaInitials||'?'}</div><span style="font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(c.vaName||'').split(' ')[0]}</span></div>
       </div>`;
-    }).join('') : `<div style="padding:32px;text-align:center;color:var(--text3)">
-      <div style="font-size:32px;margin-bottom:8px">✏️</div>
-      <div style="font-size:14px;font-weight:600;margin-bottom:4px">No posts found</div>
-      <div style="font-size:12px">Find all your social media posts in this section</div>
-      <button class="btn btn-primary" style="margin-top:14px" onclick="openAddContent()">+ New Post</button>
+    }).join('') : `<div style="padding:40px;text-align:center;color:var(--text3)">
+      <div style="font-size:32px;margin-bottom:8px">📱</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">No posts yet</div>
+      <div style="font-size:12px;margin-bottom:14px">Schedule your first social media post</div>
+      <button class="btn btn-primary" onclick="openAddContent()">+ New Post</button>
     </div>`}
   </div>
   ${pending.length?`<div class="sec-head"><div class="sec-title" style="color:var(--red)">Pending Approval</div></div>${pending.map(c=>approvalCardHtml(c)).join('')}`:''}
   ${revision.length?`<div class="sec-head" style="margin-top:14px"><div class="sec-title" style="color:var(--amber)">Revision Requested</div></div>${revision.map(c=>approvalCardHtml(c,true)).join('')}`:''}
-  ${pending.length===0&&revision.length===0&&allContent.length>0?`<div style="margin-top:10px;padding:12px 16px;background:var(--green-pale);border-radius:var(--r2);color:var(--green);font-weight:600;font-size:13px;text-align:center">✓ All content reviewed!</div>`:''}`;
+  ${pending.length===0&&revision.length===0&&allContent.length>0?`<div style="margin-top:10px;padding:12px 16px;background:var(--green-pale);border-radius:var(--r2);color:var(--green);font-weight:600;font-size:13px;text-align:center">✓ All content reviewed — nothing pending!</div>`:''}`;
+
+  return header + (view==='calendar' ? renderSPCalendar(filteredContent) : listView) + renderSPInsights(allContent);
+}
+
+function renderSPCalendar(posts){
+  const now = new Date();
+  const ref = APP.spCalMonth ? new Date(APP.spCalMonth) : now;
+  const y = ref.getFullYear(), m = ref.getMonth();
+  const firstDay = new Date(y, m, 1).getDay();
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const monthLabel = ref.toLocaleDateString('en-US',{month:'long',year:'numeric'});
+  const todayStr = now.toISOString().split('T')[0];
+  const prevM = new Date(y, m-1, 1).toISOString().split('T')[0];
+  const nextM = new Date(y, m+1, 1).toISOString().split('T')[0];
+
+  const byDate = {};
+  posts.forEach(p => {
+    const d = p.scheduleDate || '';
+    if(d && d.slice(0,7) === `${y}-${String(m+1).padStart(2,'0')}`) {
+      (byDate[d] = byDate[d]||[]).push(p);
+    }
+  });
+
+  let cells = '';
+  for(let i=0;i<firstDay;i++) cells += `<div class="sp-cal-day other-month"></div>`;
+  for(let d=1;d<=daysInMonth;d++){
+    const ds = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayPosts = byDate[ds]||[];
+    cells += `<div class="sp-cal-day">
+      <div class="sp-cal-num${ds===todayStr?' today':''}">${d}</div>
+      ${dayPosts.map(p=>`<div class="sp-cal-pill ${p.status}" onclick="openPostDetail('${p.id}')" title="${p.title}">${platIcon(postPlatforms(p)[0])} ${p.title.slice(0,18)}</div>`).join('')}
+    </div>`;
+  }
+  const rem = (firstDay+daysInMonth)%7;
+  if(rem>0) for(let i=rem;i<7;i++) cells += `<div class="sp-cal-day other-month"></div>`;
+
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <button class="btn btn-sm btn-secondary" onclick="APP.spCalMonth='${prevM}';renderCurrentPage()">← Prev</button>
+    <div style="font-size:13px;font-weight:600">${monthLabel}</div>
+    <button class="btn btn-sm btn-secondary" onclick="APP.spCalMonth='${nextM}';renderCurrentPage()">Next →</button>
+  </div>
+  <div class="sp-cal-wrap">
+    <div class="sp-cal">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d=>`<div class="sp-cal-hdr">${d}</div>`).join('')}${cells}</div>
+  </div>`;
+}
+
+function renderSPInsights(allContent){
+  if(!allContent.length) return '';
+  const platforms = Object.keys(PLAT_META);
+  const cards = platforms.map(p=>{
+    const posts = allContent.filter(c=>postPlatforms(c).includes(p));
+    if(!posts.length) return '';
+    const approved = posts.filter(x=>x.status==='approved').length;
+    const pending  = posts.filter(x=>x.status==='pending').length;
+    const revision = posts.filter(x=>x.status==='revision').length;
+    return `<div class="insight-card">
+      <div class="insight-icon">${platIcon(p)}</div>
+      <div class="insight-name">${p}</div>
+      <div class="insight-stat">${posts.length}</div>
+      <div class="insight-sub">total posts</div>
+      <div class="insight-pills">
+        ${approved?`<span class="tag t-green" style="font-size:9px">${approved} done</span>`:''}
+        ${pending?`<span class="tag t-red" style="font-size:9px">${pending} pending</span>`:''}
+        ${revision?`<span class="tag t-amber" style="font-size:9px">${revision} revision</span>`:''}
+      </div>
+    </div>`;
+  }).filter(Boolean).join('');
+  if(!cards) return '';
+  return `
+  <div class="sec-head" style="margin-top:24px"><div class="sec-title">Platform Insights</div></div>
+  <div class="insights-grid">${cards}</div>`;
+}
+
+function openPostDetail(id){
+  const c = APP.data.content.find(x=>x.id===id);
+  if(!c) return;
+  const plats = postPlatforms(c);
+  const imgUrl = drivePreviewUrl(c.imageUrl);
+  const statusTag2 = c.status==='pending'?'t-red':c.status==='approved'?'t-green':'t-amber';
+  openModal(c.title, `
+    <div class="sp-preview-card">
+      <div class="sp-preview-card-head">
+        <span style="font-size:18px">${platIcon(plats[0])}</span>
+        <div><div style="font-size:12px;font-weight:600">${plats.join(' · ')}</div><div style="font-size:10px;color:var(--text3)">@thejobscollective</div></div>
+        <span class="tag ${statusTag2}" style="margin-left:auto">${c.status}</span>
+      </div>
+      ${imgUrl ? `<img class="sp-preview-img" src="${imgUrl}" onerror="this.outerHTML='<div class=sp-preview-img-ph>🖼</div>'" alt="Post image">` : `<div class="sp-preview-img-ph">🖼 No image attached</div>`}
+      <div class="sp-preview-body">${c.title}</div>
+      <div class="sp-preview-plats">
+        ${plats.map(p=>`<span style="font-size:13px" title="${p}">${platIcon(p)}</span>`).join('')}
+        <span style="font-size:11px;color:var(--text3);margin-left:4px">${c.scheduleDate||c.dueLabel||'Not scheduled'}</span>
+      </div>
+    </div>
+    <div class="info-grid" style="margin-top:12px">
+      <div class="info-box"><div class="info-label">Type</div><div class="info-val">${c.postType||'Post'}</div></div>
+      <div class="info-box"><div class="info-label">Client</div><div class="info-val">${c.clientName||'—'}</div></div>
+      <div class="info-box"><div class="info-label">VA</div><div class="info-val">${c.vaName||'—'}</div></div>
+      <div class="info-box"><div class="info-label">Scheduled</div><div class="info-val">${c.scheduleDate||c.dueLabel||'—'}</div></div>
+    </div>`,
+    `${c.status==='pending'?`<button class="btn btn-primary" onclick="approveContent('${c.id}');closeModal()">✓ Approve</button><button class="btn btn-secondary" onclick="reviseContent('${c.id}');closeModal()">↩ Revision</button>`:''}
+    <button class="btn btn-secondary" onclick="openEditContent('${c.id}')">✎ Edit</button>
+    <button class="btn btn-danger" onclick="deleteContent('${c.id}')">🗑 Delete</button>
+    <button class="btn btn-secondary" onclick="closeModal()">Close</button>`
+  );
 }
 
 function renderInvoices(){
@@ -1667,7 +1825,20 @@ function renderInvoices(){
     <button class="btn btn-sm btn-primary" onclick="openAddInvoice()">+ New Invoice</button>
   </div>
   <div class="card">
-    ${invs.map(inv=>`<div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);cursor:pointer;background:${inv.status==='Overdue'?'#FFF8F8':''}" onclick="openInvoiceDetail('${inv.id}')" onmouseover="this.style.background='#FAFBFE'" onmouseout="this.style.background='${inv.status==='Overdue'?'#FFF8F8':''}'"><span style="font-size:10px;color:var(--text3);min-width:72px;font-weight:500">${inv.number}</span><span style="font-size:13px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${inv.client}</span><span class="tag ${invoiceTag(inv.status)}">${inv.status}</span><span style="font-size:10px;color:var(--text3)">${inv.dueDate||'—'}</span><div class="dual-currency" style="text-align:right;min-width:90px"><span class="dc-primary currency-usd" style="font-size:13px">$${inv.amountUsd.toLocaleString()}</span><span class="dc-secondary">₱${FIN.toPhp(inv.amountUsd).toLocaleString()}</span></div>${inv.status!=='Paid'?`<button class="btn btn-xs" style="background:var(--green-pale);color:var(--green);border:1px solid #a7d9bb;flex-shrink:0" onclick="event.stopPropagation();markPaid('${inv.id}')">Mark Paid</button>`:`<span style="font-size:10px;color:var(--green);font-weight:600;flex-shrink:0;min-width:60px">✓ ${inv.paidAt}</span>`}<button class="btn-icon" onclick="event.stopPropagation();archiveDoc('invoices','${inv.id}','${inv.number}')" style="opacity:0" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">🗃</button></div>`).join('')}
+    ${invs.map(inv=>`
+    <div style="display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);background:${inv.status==='Overdue'?'#FFF8F8':''};transition:background .1s" onmouseover="this.style.background='#FAFBFE'" onmouseout="this.style.background='${inv.status==='Overdue'?'#FFF8F8':''}'" onclick="openInvoiceDetail('${inv.id}')">
+      <span style="font-size:11px;color:var(--text3);min-width:80px;font-weight:500">${inv.number}</span>
+      <span style="font-size:13px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${inv.client}</span>
+      <span class="tag ${invoiceTag(inv.status)}">${inv.status}</span>
+      <span style="font-size:11px;color:var(--text3);min-width:80px">${inv.dueDate||'—'}</span>
+      <div class="dual-currency" style="text-align:right;min-width:90px">
+        <span class="dc-primary currency-usd" style="font-size:13px">$${inv.amountUsd.toLocaleString()}</span>
+        <span class="dc-secondary">₱${FIN.toPhp(inv.amountUsd).toLocaleString()}</span>
+      </div>
+      ${inv.status!=='Paid'?`<button class="btn btn-xs" style="background:var(--green-pale);color:var(--green);border:1px solid #a7d9bb;flex-shrink:0" onclick="event.stopPropagation();markPaid('${inv.id}')">✓ Mark Paid</button>`:`<span style="font-size:11px;color:var(--green);font-weight:600;flex-shrink:0;min-width:60px">✓ ${inv.paidAt}</span>`}
+      <button class="btn btn-xs btn-secondary" onclick="event.stopPropagation();openEditInvoice('${inv.id}')" title="Edit invoice">✎</button>
+      <button class="btn btn-xs btn-danger" onclick="event.stopPropagation();deleteInvoice('${inv.id}')" title="Delete invoice">🗑</button>
+    </div>`).join('')}
     ${invs.length===0?emptyState('No invoices.'):''}
   </div>`;
 }
@@ -2084,6 +2255,44 @@ async function saveInvoice(){
   toast('Invoice created!','success');
 }
 
+function openEditInvoice(id){
+  const inv = APP.data.invoices.find(x=>x.id===id);
+  if(!inv) return;
+  openModal('Edit Invoice — '+inv.number, `
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Invoice #</label><input class="form-control" id="f-ied-num" value="${inv.number}"></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="f-ied-status">${['Draft','Sent','Paid','Overdue'].map(s=>`<option${s===inv.status?' selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Client</label><select class="form-control" id="f-ied-client"><option value="${inv.clientId}|${inv.client}" selected>${inv.client}</option>${APP.data.clients.filter(c=>c.id!==inv.clientId).map(c=>`<option value="${c.id}|${c.name}">${c.name}</option>`).join('')}</select></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Amount (USD) *</label><input type="number" class="form-control" id="f-ied-usd" value="${inv.amountUsd}"><div class="form-note" id="f-ied-php">≈ ₱${FIN.toPhp(inv.amountUsd).toLocaleString()}</div></div>
+      <div class="form-group"><label class="form-label">Due Date</label><input type="date" class="form-control" id="f-ied-due" value="${inv.dueDate||''}"></div>
+    </div>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-danger btn-sm" onclick="deleteInvoice('${id}')">🗑 Delete</button><button class="btn btn-primary" onclick="saveEditInvoice('${id}')">Save Changes</button>`
+  );
+  setTimeout(()=>{ const el = document.getElementById('f-ied-usd'); if(el) el.addEventListener('input',function(){ document.getElementById('f-ied-php').textContent='≈ ₱'+FIN.toPhp(parseFloat(this.value)||0).toLocaleString(); }); },100);
+}
+
+async function saveEditInvoice(id){
+  const inv = APP.data.invoices.find(x=>x.id===id);
+  if(!inv) return;
+  const amt = parseFloat(document.getElementById('f-ied-usd').value)||0;
+  if(!amt){ toast('Amount required.','error'); return; }
+  const cp = document.getElementById('f-ied-client').value.split('|');
+  const status = document.getElementById('f-ied-status').value;
+  await updateDoc('invoices',id,{number:document.getElementById('f-ied-num').value,clientId:cp[0],client:cp[1],amountUsd:amt,status,dueDate:document.getElementById('f-ied-due').value,paidAt:status==='Paid'?(inv.paidAt||today()):inv.paidAt,_actAction:'edited invoice',_actIcon:'✎',_actColor:'amber',_actRecord:inv.number});
+  closeModal(); renderCurrentPage(); toast('Invoice updated.','success');
+}
+
+function deleteInvoice(id){
+  const inv = APP.data.invoices.find(x=>x.id===id);
+  if(!inv) return;
+  if(!confirm(`Delete invoice ${inv.number} for ${inv.client}? This cannot be undone.`)) return;
+  APP.data.invoices = APP.data.invoices.filter(x=>x.id!==id);
+  lsSave('invoices', APP.data.invoices);
+  closeModal(); renderCurrentPage(); toast('Invoice deleted.','warning');
+}
+
 async function markPaid(id){
   const inv=APP.data.invoices.find(x=>x.id===id);
   if(!inv) return;
@@ -2105,17 +2314,111 @@ function filterSocialPlan(el, platform){
 }
 
 function openAddContent(){
-  const platforms=['Facebook','Instagram','LinkedIn','TikTok','Threads','Twitter / X','Google Business','YouTube','Pinterest','Facebook + Instagram','Instagram + Facebook'];
-  openModal('New Social Post',`<div class="form-group"><label class="form-label">Post Title / Caption *</label><input class="form-control" id="f-ct-title" placeholder="e.g. BrandX — May Week 1 Carousel"></div><div class="form-row"><div class="form-group"><label class="form-label">Platform(s)</label><select class="form-control" id="f-ct-platform"><option value="">— Select Platform —</option>${platforms.map(p=>`<option>${p}</option>`).join('')}</select></div><div class="form-group"><label class="form-label">Assigned VA</label><select class="form-control" id="f-ct-va">${APP.data.team.filter(v=>v.role==='va'||v.role==='ops_va').map(v=>`<option value="${v.id}|${v.displayName}|${v.initials}|${v.avatarColor}">${v.displayName}</option>`).join('')}</select></div></div><div class="form-row"><div class="form-group"><label class="form-label">Client</label><select class="form-control" id="f-ct-client"><option value="">— Any —</option>${APP.data.clients.filter(c=>c.status==='Active').map(c=>`<option value="${c.id}">${c.name}</option>`).join('')}</select></div><div class="form-group"><label class="form-label">Urgency</label><select class="form-control" id="f-ct-urgency"><option value="red">🔴 High</option><option value="amber">🟡 Medium</option><option value="gray" selected>⚪ Normal</option></select></div></div><div class="form-row"><div class="form-group"><label class="form-label">Due / Schedule Label</label><input class="form-control" id="f-ct-due" placeholder="e.g. May 15, Due today"></div><div class="form-group"><label class="form-label">Post Type</label><select class="form-control" id="f-ct-type"><option>Post</option><option>Reel</option><option>Carousel</option><option>Story</option><option>Video</option><option>Article</option></select></div></div>`,`<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveContent()">+ Add Post</button>`);
+  const vaOpts = APP.data.team.filter(v=>v.role==='va'||v.role==='ops_va').map(v=>`<option value="${v.id}|${v.displayName}|${v.initials}|${v.avatarColor}">${v.displayName}</option>`).join('');
+  const clientOpts = APP.data.clients.filter(c=>c.status==='Active').map(c=>`<option value="${c.id}|${c.name}">${c.name}</option>`).join('');
+  const platChecks = Object.entries(PLAT_META).map(([p,m])=>`<label class="plat-check" id="pc-${p.replace(/[\s/]/g,'_')}"><input type="checkbox" class="f-ct-plat" value="${p}" onchange="updatePostPreview()"> ${m.icon} ${p}</label>`).join('');
+  openModal('Compose New Post', `
+    <div class="form-group">
+      <label class="form-label">Caption / Title *</label>
+      <textarea class="form-control" id="f-ct-title" rows="3" placeholder="Write your post caption here..." oninput="updatePostPreview()"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Platforms * (select one or more)</label>
+      <div class="plat-check-grid">${platChecks}</div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Image / Media URL</label>
+      <input class="form-control" id="f-ct-image" placeholder="Paste Google Drive link or image URL" oninput="updatePostPreview()">
+      <div class="form-note">Tip: In Google Drive, right-click your image → Share → Copy link, then paste here.</div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Schedule Date</label><input type="date" class="form-control" id="f-ct-date"></div>
+      <div class="form-group"><label class="form-label">Post Type</label><select class="form-control" id="f-ct-type"><option>Post</option><option>Reel</option><option>Carousel</option><option>Story</option><option>Video</option><option>Article</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Client</label><select class="form-control" id="f-ct-client"><option value="">— Any —</option>${clientOpts}</select></div>
+      <div class="form-group"><label class="form-label">Assigned VA</label><select class="form-control" id="f-ct-va">${vaOpts}</select></div>
+    </div>
+    <div class="sp-preview-card" id="post-live-preview">
+      <div class="sp-preview-card-head"><span style="font-size:16px">📱</span><div><div style="font-size:12px;font-weight:600">Post Preview</div><div style="font-size:10px;color:var(--text3)">@thejobscollective</div></div></div>
+      <div class="sp-preview-img-ph">🖼 Add an image URL above to preview</div>
+      <div class="sp-preview-body" id="preview-caption" style="color:var(--text3);font-style:italic">Your caption will appear here…</div>
+      <div class="sp-preview-plats" id="preview-plats"><span style="font-size:11px;color:var(--text3)">No platforms selected</span></div>
+    </div>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="saveContent()">+ Schedule Post</button>`
+  );
+}
+
+function updatePostPreview(){
+  const caption = (document.getElementById('f-ct-title')||{}).value || '';
+  const imgUrl = drivePreviewUrl((document.getElementById('f-ct-image')||{}).value || '');
+  const checked = [...document.querySelectorAll('.f-ct-plat:checked')].map(x=>x.value);
+  const prev = document.getElementById('post-live-preview');
+  if(!prev) return;
+  const imgArea = prev.querySelector('.sp-preview-img,.sp-preview-img-ph');
+  if(imgArea && imgUrl){
+    imgArea.outerHTML = `<img class="sp-preview-img" src="${imgUrl}" onerror="this.outerHTML='<div class=sp-preview-img-ph>🖼 Could not load image — check the URL</div>'" alt="preview">`;
+  } else if(imgArea && !imgUrl){
+    if(imgArea.tagName==='IMG') imgArea.outerHTML = `<div class="sp-preview-img-ph">🖼 Add an image URL above to preview</div>`;
+  }
+  const cap = document.getElementById('preview-caption');
+  if(cap){ cap.textContent = caption || 'Your caption will appear here…'; cap.style.fontStyle = caption?'normal':'italic'; cap.style.color = caption?'var(--text)':'var(--text3)'; }
+  const platsEl = document.getElementById('preview-plats');
+  if(platsEl) platsEl.innerHTML = checked.length ? checked.map(p=>`<span style="font-size:14px" title="${p}">${platIcon(p)}</span>`).join('') + `<span style="font-size:11px;color:var(--text3);margin-left:4px">${checked.join(' · ')}</span>` : `<span style="font-size:11px;color:var(--text3)">No platforms selected</span>`;
 }
 
 async function saveContent(){
-  const title=document.getElementById('f-ct-title').value.trim();
-  if(!title){ toast('Please enter a title.','error'); return; }
-  const va=document.getElementById('f-ct-va').value.split('|');
-  await addDoc('content',{title,status:'pending',vaUid:va[0],vaName:va[1],vaInitials:va[2],vaColor:va[3],platform:document.getElementById('f-ct-platform').value||'Various',dueLabel:document.getElementById('f-ct-due').value||'—',urgency:document.getElementById('f-ct-urgency').value,archived:false,_actAction:'submitted content for approval',_actIcon:'📱',_actColor:'navy',_actRecord:title.slice(0,40)});
+  const title = document.getElementById('f-ct-title').value.trim();
+  if(!title){ toast('Please enter a caption/title.','error'); return; }
+  const platforms = [...document.querySelectorAll('.f-ct-plat:checked')].map(x=>x.value);
+  if(!platforms.length){ toast('Select at least one platform.','error'); return; }
+  const va = document.getElementById('f-ct-va').value.split('|');
+  const clientVal = document.getElementById('f-ct-client').value.split('|');
+  const imageUrl = document.getElementById('f-ct-image').value.trim();
+  const scheduleDate = document.getElementById('f-ct-date').value;
+  const postType = document.getElementById('f-ct-type').value;
+  await addDoc('content',{title,status:'pending',platforms,platform:platforms.join(', '),imageUrl,scheduleDate,postType,vaUid:va[0],vaName:va[1],vaInitials:va[2],vaColor:va[3],clientId:clientVal[0]||'',clientName:clientVal[1]||'',dueLabel:scheduleDate||'—',archived:false,_actAction:'scheduled a post',_actIcon:'📱',_actColor:'navy',_actRecord:title.slice(0,40)});
   closeModal();
-  toast('Content submitted for approval!','success');
+  toast('Post scheduled for approval!','success');
+}
+
+function openEditContent(id){
+  const c = APP.data.content.find(x=>x.id===id);
+  if(!c) return;
+  const vaOpts = APP.data.team.filter(v=>v.role==='va'||v.role==='ops_va').map(v=>`<option value="${v.id}|${v.displayName}|${v.initials}|${v.avatarColor}"${v.id===c.vaUid?' selected':''}>${v.displayName}</option>`).join('');
+  const savedPlats = postPlatforms(c);
+  const platChecks = Object.entries(PLAT_META).map(([p,m])=>`<label class="plat-check${savedPlats.includes(p)?' on':''}"><input type="checkbox" class="f-ct-plat" value="${p}"${savedPlats.includes(p)?' checked':''}> ${m.icon} ${p}</label>`).join('');
+  openModal('Edit Post', `
+    <div class="form-group"><label class="form-label">Caption / Title *</label><textarea class="form-control" id="f-cte-title" rows="3">${c.title}</textarea></div>
+    <div class="form-group"><label class="form-label">Platforms *</label><div class="plat-check-grid">${platChecks}</div></div>
+    <div class="form-group"><label class="form-label">Image / Media URL</label><input class="form-control" id="f-cte-image" value="${c.imageUrl||''}"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-label">Schedule Date</label><input type="date" class="form-control" id="f-cte-date" value="${c.scheduleDate||''}"></div>
+      <div class="form-group"><label class="form-label">Status</label><select class="form-control" id="f-cte-status">${['pending','approved','revision'].map(s=>`<option${s===c.status?' selected':''}>${s}</option>`).join('')}</select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Assigned VA</label><select class="form-control" id="f-cte-va">${vaOpts}</select></div>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-danger btn-sm" onclick="deleteContent('${id}')">🗑 Delete</button><button class="btn btn-primary" onclick="saveEditContent('${id}')">Save</button>`
+  );
+}
+
+async function saveEditContent(id){
+  const c = APP.data.content.find(x=>x.id===id);
+  if(!c) return;
+  const title = document.getElementById('f-cte-title').value.trim();
+  if(!title){ toast('Caption required.','error'); return; }
+  const platforms = [...document.querySelectorAll('.f-ct-plat:checked')].map(x=>x.value);
+  const va = document.getElementById('f-cte-va').value.split('|');
+  await updateDoc('content',id,{title,platforms,platform:platforms.join(', '),imageUrl:document.getElementById('f-cte-image').value.trim(),scheduleDate:document.getElementById('f-cte-date').value,status:document.getElementById('f-cte-status').value,vaUid:va[0],vaName:va[1],vaInitials:va[2],vaColor:va[3],_actAction:'updated post',_actIcon:'✎',_actColor:'teal',_actRecord:title.slice(0,40)});
+  closeModal(); renderCurrentPage(); toast('Post updated.','success');
+}
+
+async function deleteContent(id){
+  const c = APP.data.content.find(x=>x.id===id);
+  if(!c) return;
+  if(!confirm(`Delete "${c.title}"? This cannot be undone.`)) return;
+  APP.data.content = APP.data.content.filter(x=>x.id!==id);
+  lsSave('content', APP.data.content);
+  closeModal(); renderCurrentPage(); toast('Post deleted.','warning');
 }
 
 async function approveContent(id){
