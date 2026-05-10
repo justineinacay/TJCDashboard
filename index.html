@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TJC Business OS — The Jobs Collective</title>
 <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -320,6 +321,86 @@ select.form-control{cursor:pointer}
 @media(min-width:681px){.bottom-nav{display:none!important}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .22s ease forwards}
+/* Welcome banner */
+.welcome-banner{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 60%,#1a4a4a 100%);border-radius:var(--r3);padding:22px 24px;color:#fff;margin-bottom:20px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:space-between}
+.welcome-banner::before{content:'';position:absolute;right:-30px;top:-30px;width:180px;height:180px;border-radius:50%;background:rgba(201,168,76,.10)}
+.welcome-banner::after{content:'';position:absolute;right:60px;bottom:-40px;width:100px;height:100px;border-radius:50%;background:rgba(42,127,127,.15)}
+.wb-left{position:relative}
+.wb-greeting{font-size:22px;font-weight:700;margin-bottom:4px;letter-spacing:-.02em}
+.wb-emoji{font-size:22px;margin-left:6px}
+.wb-tip{font-size:12.5px;color:rgba(255,255,255,.75);line-height:1.5;max-width:480px}
+.wb-tip strong{color:#fff}
+.wb-mascot{font-size:52px;position:relative;flex-shrink:0;line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.2))}
+/* Colored KPI cards */
+.kpi-card-colored{border-radius:var(--r2);padding:18px 20px;cursor:pointer;transition:all .2s;color:#fff;position:relative;overflow:hidden}
+.kpi-card-colored:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.kpi-card-colored::after{content:'';position:absolute;right:-15px;bottom:-15px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.08)}
+.kpi-cc-label{font-size:11px;font-weight:600;color:rgba(255,255,255,.75);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.kpi-cc-val{font-size:32px;font-weight:800;line-height:1;margin-bottom:5px}
+.kpi-cc-sub{font-size:11px;color:rgba(255,255,255,.7)}
+.kpi-cc-icon{position:absolute;right:16px;top:14px;font-size:22px;opacity:.4}
+/* Analytics row */
+.analytics-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:14px 18px;margin-bottom:20px}
+.analytics-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+.analytics-stats{display:flex;gap:24px;flex-wrap:wrap}
+.an-stat{text-align:center}
+.an-stat-val{font-size:16px;font-weight:700;color:var(--navy)}
+.an-stat-lbl{font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-top:1px}
+/* Charts */
+.chart-widget{background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:16px;overflow:hidden}
+.chart-widget canvas{max-height:200px}
+/* Appointment status */
+.appt-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-bottom:1px solid var(--border)}
+.appt-item:last-child{border-bottom:none}
+.appt-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.appt-info{flex:1;min-width:0}
+.appt-name{font-size:12px;font-weight:600}
+.appt-meta{font-size:10px;color:var(--text3)}
+/* Social Planner */
+.sp-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.sp-platform-filter{display:flex;gap:6px}
+.sp-platform-btn{display:flex;align-items:center;gap:4px;padding:5px 10px;border-radius:20px;border:1.5px solid var(--border2);font-size:11px;font-weight:500;cursor:pointer;background:var(--surface);color:var(--text2);transition:all .15s}
+.sp-platform-btn.on{border-color:var(--teal);background:var(--teal-pale);color:var(--teal-dark)}
+.sp-platform-btn:hover{border-color:var(--teal);color:var(--teal)}
+.sp-view-toggle{display:flex;background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:2px}
+.sp-view-btn{padding:4px 10px;border-radius:4px;font-size:11px;cursor:pointer;color:var(--text3);transition:all .15s}
+.sp-view-btn.on{background:var(--surface);color:var(--navy);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.sp-date-range{font-size:11px;color:var(--text2);background:var(--bg);border:1px solid var(--border);border-radius:var(--r);padding:5px 10px}
+.sp-content-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.sp-content-row:hover{background:#FAFBFE}
+.sp-content-row:last-child{border-bottom:none}
+.sp-platform-icon{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+/* Conversations */
+.conv-layout{display:flex;height:calc(100vh - 110px);gap:0;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;background:var(--surface)}
+.conv-list{width:300px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column}
+.conv-list-head{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between}
+.conv-thread{display:flex;align-items:flex-start;gap:9px;padding:10px 12px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .12s}
+.conv-thread:hover,.conv-thread.on{background:var(--navy-pale)}
+.conv-thread-info{flex:1;min-width:0}
+.conv-thread-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.conv-thread-preview{font-size:11px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.conv-thread-meta{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.conv-thread-date{font-size:10px;color:var(--text3)}
+.conv-unread{background:var(--red);color:#fff;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center}
+.conv-main{flex:1;min-width:0;display:flex;flex-direction:column}
+.conv-main-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.conv-messages{flex:1;overflow-y:auto;padding:16px}
+.conv-msg{display:flex;gap:8px;margin-bottom:14px}
+.conv-msg.out{flex-direction:row-reverse}
+.conv-msg-bubble{max-width:70%;padding:10px 13px;border-radius:12px;font-size:13px;line-height:1.5}
+.conv-msg.in .conv-msg-bubble{background:var(--bg);border:1px solid var(--border);border-radius:4px 12px 12px 12px}
+.conv-msg.out .conv-msg-bubble{background:var(--navy);color:#fff;border-radius:12px 4px 12px 12px}
+.conv-msg-time{font-size:10px;color:var(--text3);margin-top:3px;text-align:right}
+.conv-msg.in .conv-msg-time{text-align:left}
+.conv-input-row{padding:10px 14px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:center}
+.conv-input{flex:1;padding:9px 13px;border-radius:20px;border:1px solid var(--border2);font-size:13px;font-family:var(--font);outline:none;transition:border .15s}
+.conv-input:focus{border-color:var(--teal)}
+.conv-sidebar{width:220px;flex-shrink:0;border-left:1px solid var(--border);padding:14px;overflow-y:auto}
+.conv-sidebar-title{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+.conv-detail-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px}
+.conv-detail-label{color:var(--text3)}
+.conv-detail-val{font-weight:500;color:var(--text);text-align:right}
+@media(max-width:680px){.conv-sidebar{display:none}.conv-list{width:100%}.conv-main{display:none}.conv-list.hide{display:none}.conv-main.show{display:flex}}
 </style>
 </head>
 <body>
@@ -452,6 +533,12 @@ const SEED = {
     {id:'a3',user:'Justine Bautista',userInitials:'JB',action:'approved content',type:'content',record:'BrandX Product Feature Reel',icon:'✓',color:'gold',ts:'2025-04-22T14:00:00Z'},
     {id:'a4',user:'Ana Cruz',userInitials:'AC',action:'logged 1h time',type:'timelog',record:'TechStart Manila',icon:'⏱',color:'navy',ts:'2025-04-23T09:00:00Z'},
     {id:'a5',user:'Justine Bautista',userInitials:'JB',action:'created invoice',type:'invoice',record:'INV-2025-004 — Sunrise Wellness',icon:'🧾',color:'amber',ts:'2025-04-23T10:00:00Z'},
+  ],
+  conversations: [
+    {id:'cv1',contact:'Alicia Tan',contactInitials:'AT',contactColor:'teal',preview:'Hi! Can we move our call to Thursday?',date:'Today',unread:2,messages:[{from:'in',text:'Hi! Can we move our call to Thursday?',time:'10:02 AM'},{from:'in',text:'Let me know if that works for you.',time:'10:03 AM'}]},
+    {id:'cv2',contact:'BrandX — Kevin',contactInitials:'BX',contactColor:'navy',preview:'The carousel looks great, approved!',date:'May 6',unread:0,messages:[{from:'in',text:'The carousel looks great, approved!',time:'3:41 PM'},{from:'out',text:'Wonderful! We will schedule it for this weekend.',time:'4:05 PM'}]},
+    {id:'cv3',contact:'Nova Muros',contactInitials:'NM',contactColor:'gold',preview:'Reminder: Your call with Rachel…',date:'Apr 20',unread:1,messages:[{from:'in',text:'Reminder: Your call with Rachel is tomorrow at 2 PM.',time:'8:00 AM'}]},
+    {id:'cv4',contact:'Chester Cruz',contactInitials:'CC',contactColor:'purple',preview:'Please see the updated proposal.',date:'Apr 16',unread:1,messages:[{from:'out',text:'Hi Chester, here is the proposal we discussed.',time:'9:00 AM'},{from:'in',text:'Please see the updated proposal.',time:'9:30 AM'}]},
   ]
 };
 
@@ -460,7 +547,8 @@ const APP = {
   profile: null,
   role: 'owner',
   page: 'home',
-  data: { tasks:[],clients:[],timelogs:[],content:[],invoices:[],goals:[],team:[],events:[],activities:[] },
+  data: { tasks:[],clients:[],timelogs:[],content:[],invoices:[],goals:[],team:[],events:[],activities:[],conversations:[] },
+  convActive: 'cv1',
   va: { loggedIn:false,vaId:null,pinEntry:'',tab:'dashboard',taskFilter:'open' },
   cp: { clientId:null,tab:'overview' },
   timer: { running:false,start:null,elapsed:0,iv:null },
@@ -472,9 +560,10 @@ const PAGE_TITLES = {
   finance:'Financial Intelligence', capacity:'VA Capacity',
   kpi:'KPI & Performance', sla:'SLA Tracker',
   health:'Client Health', activity:'Activity Log',
-  tasks:'Task Manager', content:'Content Approvals',
+  tasks:'Task Manager', content:'Social Planner',
   invoices:'Invoice Tracker', team:'VA Roster',
   goals:'OKR Goals', onboarding:'Onboarding Tracker',
+  conversations:'Conversations',
   vaportal:'VA Portal', clientportal:'Client Portal'
 };
 
@@ -511,7 +600,7 @@ function saveConfig(){
 }
 
 function loadAllData(){
-  ['tasks','clients','timelogs','content','invoices','goals','team','events','activities'].forEach(col => {
+  ['tasks','clients','timelogs','content','invoices','goals','team','events','activities','conversations'].forEach(col => {
     APP.data[col] = lsLoad(col);
   });
   loadConfig();
@@ -823,6 +912,8 @@ function buildNav(){
     {sect:'Team & Company'},
     {page:'team',icon:'team',label:'VA Roster'},
     {page:'goals',icon:'goals',label:'OKR Goals'},
+    {sect:'Communication'},
+    {page:'conversations',icon:'conv',label:'Conversations',badge:'conversations'},
     {sect:'Portals'},
     {page:'vaportal',icon:'va',label:'VA Portal'},
     {page:'clientportal',icon:'cp',label:'Client Portal'},
@@ -843,7 +934,8 @@ function buildNav(){
     team:`<svg viewBox="0 0 14 14" fill="none"><circle cx="5.5" cy="4.5" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M1 12c0-2 2-3.2 4.5-3.2S10 10 10 12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="10.5" cy="5" r="1.5" stroke="currentColor" stroke-width="1.1"/><path d="M9 12c0-1.5.8-2.5 2.5-2.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"/></svg>`,
     goals:`<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="2.5" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r=".8" fill="currentColor"/></svg>`,
     va:`<svg viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 7l2 2 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    cp:`<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.2" stroke="currentColor" stroke-width="1.2"/><path d="M2 12.5c0-2 2.2-3.5 5-3.5s5 1.5 5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`
+    cp:`<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.2" stroke="currentColor" stroke-width="1.2"/><path d="M2 12.5c0-2 2.2-3.5 5-3.5s5 1.5 5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
+    conv:`<svg viewBox="0 0 14 14" fill="none"><path d="M2 2h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H5l-3 2V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>`
   };
   document.getElementById('sb-nav').innerHTML = ownerNav.map(item => {
     if(item.sect) return '<div class="sb-sect">' + item.sect + '</div>';
@@ -855,6 +947,10 @@ function buildNav(){
     if(item.badge === 'invoices'){
       const count = APP.data.invoices.filter(i => i.status === 'Overdue' && !i.archived).length;
       if(count > 0) badge = '<span class="sb-badge warn">' + count + '</span>';
+    }
+    if(item.badge === 'conversations'){
+      const count = (APP.data.conversations||[]).reduce((a,c)=>a+(c.unread||0),0);
+      if(count > 0) badge = '<span class="sb-badge">' + count + '</span>';
     }
     return `<div class="sb-item${APP.page===item.page?' on':''}" data-page="${item.page}" onclick="navigate('${item.page}',this)">${icons[item.icon] || ''}${item.label}${badge}</div>`;
   }).join('');
@@ -880,6 +976,9 @@ function navigate(page, el){
 function renderCurrentPage(){
   const ca = document.getElementById('content-area');
   if(!ca) return;
+  if(typeof Chart !== 'undefined'){
+    Object.values(Chart.instances||{}).forEach(c=>c.destroy());
+  }
   const pages = {
     home: renderHome,
     clients: renderClients,
@@ -897,13 +996,29 @@ function renderCurrentPage(){
     onboarding: renderOnboarding,
     vaportal: renderVAPortal,
     clientportal: renderClientPortal,
+    conversations: renderConversations,
   };
   const fn = pages[APP.page];
   ca.innerHTML = fn ? fn() : '<div class="empty"><div class="empty-text">Page not found.</div></div>';
+  if(APP.page === 'home') setTimeout(initHomeCharts, 50);
 }
 
 function renderHome(){
   const td = today();
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
+  const greetingEmoji = hour < 12 ? '☀️' : hour < 17 ? '🌤️' : '🌙';
+  const profile = APP.profile;
+  const firstName = (profile?.displayName || 'Justine').split(' ')[0];
+
+  const tips = [
+    'You have <strong>' + (APP.data.tasks.filter(t=>!t.done&&!t.archived).length) + ' open tasks</strong> today — keep the momentum going!',
+    'Your team processed <strong>' + APP.data.timelogs.length + ' time entries</strong> this month. Great work!',
+    'Track your pipeline and close more deals in the <strong>Client Pipeline</strong> view.',
+    'Content approvals waiting? Head to <strong>Social Planner</strong> to review.',
+  ];
+  const tip = tips[new Date().getDate() % tips.length];
+
   const openTasks = APP.data.tasks.filter(t => !t.done && !t.archived);
   const overdueTasks = openTasks.filter(t => t.dueDate && t.dueDate < td);
   const pendingApv = APP.data.content.filter(c => c.status === 'pending' && !c.archived);
@@ -914,41 +1029,57 @@ function renderHome(){
   const slaRate = SLA.complianceRate(APP.data.tasks.filter(t => !t.archived));
   const overloaded = CAP.overloaded();
   const oosTotal = APP.data.clients.reduce((a, c) => a + (c.oosCount || 0), 0);
+  const totalUnread = (APP.data.conversations||[]).reduce((a,c)=>a+(c.unread||0),0);
+
+  const kpiCards = [
+    {label:'Monthly Revenue',val:'$'+mrrUsd.toLocaleString(),sub:'₱'+FIN.toPhp(mrrUsd).toLocaleString()+' · '+activeClients.length+' contracts',bg:'linear-gradient(135deg,#1a7a45,#22a05a)',icon:'💰',page:'finance'},
+    {label:'Net Profit (PHP)',val:'₱'+Math.max(0,netPhp).toLocaleString(),sub:avgMargin+'% avg margin'+(avgMargin>=CFG.marginTarget?' ✓':' ⚠'),bg:avgMargin>=CFG.marginTarget?'linear-gradient(135deg,#1d6faa,#2389cc)':'linear-gradient(135deg,#b05a00,#d4710a)',icon:'📊',page:'finance'},
+    {label:'Active Clients',val:String(activeClients.length),sub:APP.data.clients.filter(c=>['Lead','Proposal'].includes(c.status)&&!c.archived).length+' in pipeline · '+oosTotal+' OOS',bg:'linear-gradient(135deg,#1B2A4A,#243660)',icon:'🤝',page:'clients'},
+    {label:'Open Tasks',val:String(openTasks.length),sub:(overdueTasks.length>0?overdueTasks.length+' overdue ⚠':'0 overdue')+ ' · '+APP.data.tasks.filter(t=>t.done&&!t.archived).length+' done',bg:overdueTasks.length>0?'linear-gradient(135deg,#A32D2D,#c43434)':'linear-gradient(135deg,#2A7F7F,#35a0a0)',icon:'✅',page:'tasks'},
+    {label:'SLA Compliance',val:slaRate+'%',sub:'4-hour response target',bg:slaRate>=90?'linear-gradient(135deg,#1a7a45,#22a05a)':slaRate>=75?'linear-gradient(135deg,#633806,#8a5010)':'linear-gradient(135deg,#A32D2D,#c43434)',icon:'⏱',page:'sla'},
+    {label:'Awaiting Approval',val:String(pendingApv.length),sub:pendingApv.length>0?'Needs your review':'All clear ✓',bg:pendingApv.length>0?'linear-gradient(135deg,#A32D2D,#c43434)':'linear-gradient(135deg,#1a7a45,#22a05a)',icon:'📋',page:'content'},
+  ];
+
+  const convCount = (APP.data.conversations||[]).length;
+
   return `
-  <div class="kpi-grid fade-up">
-    <div class="kpi-card" style="border-left-color:var(--teal)" onclick="navigate('finance')">
-      <div class="kpi-label">Monthly Revenue (USD)</div>
-      <div class="kpi-val" style="color:var(--teal)">$${mrrUsd.toLocaleString()}</div>
-      <div class="kpi-sub">₱${FIN.toPhp(mrrUsd).toLocaleString()} · ${activeClients.length} active contracts</div>
+  <div class="welcome-banner fade-up">
+    <div class="wb-left">
+      <div class="wb-greeting">${greeting}, ${firstName}!<span class="wb-emoji">${greetingEmoji}</span></div>
+      <div class="wb-tip" style="margin-top:6px">🤖 ${tip}</div>
+      <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+        <button class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25)" onclick="navigate('tasks')">View Tasks →</button>
+        <button class="btn btn-sm" style="background:var(--gold);color:var(--navy);border:none;font-weight:700" onclick="navigate('clients')">Pipeline →</button>
+        ${totalUnread>0?`<button class="btn btn-sm" style="background:var(--red);color:#fff;border:none" onclick="navigate('conversations')">${totalUnread} Unread Messages</button>`:''}
+      </div>
     </div>
-    <div class="kpi-card" style="border-left-color:var(--green)" onclick="navigate('finance')">
-      <div class="kpi-label">Net Profit (PHP)</div>
-      <div class="kpi-val" style="color:var(--green)">₱${Math.max(0, netPhp).toLocaleString()}</div>
-      <div class="kpi-sub kpi-${avgMargin>=CFG.marginTarget?'up':avgMargin>=CFG.marginWarn?'warn':'dn'}">${avgMargin}% avg margin ${avgMargin>=CFG.marginTarget?'✓':avgMargin>=CFG.marginWarn?'⚠':'⚠ Below target'}</div>
-    </div>
-    <div class="kpi-card" style="border-left-color:var(--gold)" onclick="navigate('clients')">
-      <div class="kpi-label">Active Clients</div>
-      <div class="kpi-val" style="color:var(--gold-dark)">${activeClients.length}</div>
-      <div class="kpi-sub">${APP.data.clients.filter(c => ['Lead','Proposal'].includes(c.status) && !c.archived).length} in pipeline · ${oosTotal} OOS tasks</div>
-    </div>
-    <div class="kpi-card" style="border-left-color:var(--navy)" onclick="navigate('tasks')">
-      <div class="kpi-label">Open Tasks</div>
-      <div class="kpi-val" style="color:var(--navy)">${openTasks.length}</div>
-      <div class="kpi-sub kpi-${overdueTasks.length>0?'dn':'up'}">${overdueTasks.length} overdue · ${APP.data.tasks.filter(t => t.done && !t.archived).length} done</div>
-    </div>
-    <div class="kpi-card" style="border-left-color:var(--teal-dark)" onclick="navigate('sla')">
-      <div class="kpi-label">SLA Compliance</div>
-      <div class="kpi-val" style="color:${slaRate>=90?'var(--green)':slaRate>=75?'var(--gold)':'var(--red)'}">${slaRate}%</div>
-      <div class="kpi-sub">4-hour response target</div>
-    </div>
-    <div class="kpi-card" style="border-left-color:var(--red)" onclick="navigate('content')">
-      <div class="kpi-label">Awaiting Approval</div>
-      <div class="kpi-val" style="color:var(--red)">${pendingApv.length}</div>
-      <div class="kpi-sub">${pendingApv.length>0?'Needs your review':'All clear ✓'}</div>
-    </div>
+    <div class="wb-mascot">🚀</div>
+  </div>
+  <div class="kpi-grid fade-up" style="grid-template-columns:repeat(auto-fit,minmax(180px,1fr));margin-bottom:20px">
+    ${kpiCards.map(k=>`
+    <div class="kpi-card-colored" style="background:${k.bg}" onclick="navigate('${k.page}')">
+      <div class="kpi-cc-icon">${k.icon}</div>
+      <div class="kpi-cc-label">${k.label}</div>
+      <div class="kpi-cc-val">${k.val}</div>
+      <div class="kpi-cc-sub">${k.sub}</div>
+    </div>`).join('')}
   </div>
   ${overloaded.length>0?`<div class="cap-warning over" style="margin-bottom:14px">⚠ Capacity overload: <strong>${overloaded.map(v=>v.displayName).join(', ')}</strong> — reassign tasks before adding new clients.</div>`:''}
-  ${avgMargin<CFG.marginTarget&&avgMargin>0?`<div class="cap-warning warn" style="margin-bottom:14px">⚠ Average margin (${avgMargin}%) is below the 30% target. Review client pricing or VA costs in <span style="cursor:pointer;text-decoration:underline" onclick="navigate('finance')">Financial Intel</span>.</div>`:''}
+  ${avgMargin<CFG.marginTarget&&avgMargin>0?`<div class="cap-warning warn" style="margin-bottom:14px">⚠ Average margin (${avgMargin}%) is below the 30% target. Review client pricing in <span style="cursor:pointer;text-decoration:underline" onclick="navigate('finance')">Financial Intel</span>.</div>`:''}
+  <div class="analytics-row fade-up">
+    <div class="analytics-label">Agency Web Analytics (Last 30 Days)</div>
+    <div class="analytics-stats">
+      <div class="an-stat"><div class="an-stat-val">87</div><div class="an-stat-lbl">Total Users</div></div>
+      <div class="an-stat"><div class="an-stat-val">1.29K</div><div class="an-stat-lbl">Page Views</div></div>
+      <div class="an-stat"><div class="an-stat-val">27.2%</div><div class="an-stat-lbl">Engagement</div></div>
+      <div class="an-stat"><div class="an-stat-val">1.16K</div><div class="an-stat-lbl">Direct Views</div></div>
+      <div class="an-stat"><div class="an-stat-val">18</div><div class="an-stat-lbl">Social Views</div></div>
+      <div class="an-stat"><div class="an-stat-val">75</div><div class="an-stat-lbl">Organic Views</div></div>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
+        <canvas id="device-bar" width="120" height="48" style="display:block"></canvas>
+      </div>
+    </div>
+  </div>
   <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px;margin-bottom:20px">
     <div>
       <div class="sec-head">
@@ -971,6 +1102,19 @@ function renderHome(){
           <div class="va-cap-pct" style="color:${CAP.textColor(va.capacity||0)}">${va.capacity||0}%</div>
         </div>`).join('')}
       </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px;margin-bottom:20px">
+    <div class="chart-widget">
+      <div class="sec-head" style="margin-bottom:10px"><div class="sec-title">Client Status Breakdown</div><span class="sec-action" onclick="navigate('health')">Health →</span></div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <canvas id="client-donut" width="140" height="140" style="flex-shrink:0"></canvas>
+        <div id="donut-legend" style="font-size:11px;display:flex;flex-direction:column;gap:5px"></div>
+      </div>
+    </div>
+    <div class="chart-widget">
+      <div class="sec-head" style="margin-bottom:10px"><div class="sec-title">Pipeline by Stage</div><span class="sec-action" onclick="navigate('clients')">Pipeline →</span></div>
+      <canvas id="pipeline-bar" height="140"></canvas>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);gap:14px;margin-bottom:20px">
@@ -997,6 +1141,21 @@ function renderHome(){
       ${pendingApv.slice(0,3).map(c=>approvalCardHtml(c)).join('') || `<div class="card card-pad" style="text-align:center;color:var(--green);font-weight:600;font-size:13px">✓ All content approved!</div>`}
     </div>
     <div>
+      <div class="sec-head"><div class="sec-title">Appointment Status</div></div>
+      <div class="card">
+        ${APP.data.events.length ? APP.data.events.slice(0,4).map(ev=>`
+        <div class="appt-item">
+          <div class="appt-dot" style="background:${ev.color==='teal'?'var(--teal)':ev.color==='gold'?'var(--gold)':ev.color==='navy'?'var(--navy)':'var(--purple)'}"></div>
+          <div class="appt-info">
+            <div class="appt-name">${ev.name}</div>
+            <div class="appt-meta">${ev.date} · ${ev.time} · ${ev.who}</div>
+          </div>
+        </div>`).join('') : emptyState('No upcoming appointments.')}
+      </div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px">
+    <div>
       <div class="sec-head"><div class="sec-title">Q2 Goals</div><span class="sec-action" onclick="navigate('goals')">All →</span></div>
       <div class="card">
         ${APP.data.goals.filter(g=>!g.archived).slice(0,5).map(g=>{
@@ -1012,23 +1171,54 @@ function renderHome(){
         }).join('') || emptyState('No goals.')}
       </div>
     </div>
-  </div>
-  <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px">
     <div>
       <div class="sec-head"><div class="sec-title">Recent Activity</div><span class="sec-action" onclick="navigate('activity')">Full log →</span></div>
-      <div class="card">${APP.data.activities.slice(0,6).map(a=>activityItemHtml(a)).join('') || emptyState('No activity yet.')}</div>
-    </div>
-    <div>
-      <div class="sec-head"><div class="sec-title">Upcoming</div></div>
-      <div class="card">
-        ${APP.data.events.map(ev=>`
-        <div style="display:flex;align-items:flex-start;gap:8px;padding:7px 12px;border-bottom:1px solid var(--border)">
-          <div style="width:7px;height:7px;border-radius:50%;background:${ev.color==='teal'?'var(--teal)':ev.color==='gold'?'var(--gold)':ev.color==='navy'?'var(--navy)':'var(--purple)'};flex-shrink:0;margin-top:4px"></div>
-          <div><div style="font-size:12px;font-weight:600">${ev.name}</div><div style="font-size:10px;color:var(--text3)">${ev.date} · ${ev.time} · ${ev.who}</div></div>
-        </div>`).join('')}
-      </div>
+      <div class="card">${APP.data.activities.slice(0,5).map(a=>activityItemHtml(a)).join('') || emptyState('No activity yet.')}</div>
     </div>
   </div>`;
+}
+
+function initHomeCharts(){
+  if(typeof Chart === 'undefined') return;
+  Chart.defaults.font.family = "'Outfit', system-ui, sans-serif";
+
+  const donutEl = document.getElementById('client-donut');
+  if(donutEl && !donutEl._chart){
+    const statuses = ['Active','Onboarding','Proposal','Lead','Completed'];
+    const colors = ['#1a7a45','#2A7F7F','#C9A84C','#1B2A4A','#8892a4'];
+    const counts = statuses.map(s => APP.data.clients.filter(c=>c.status===s&&!c.archived).length);
+    const total = counts.reduce((a,b)=>a+b,0);
+    const legend = document.getElementById('donut-legend');
+    if(legend){
+      legend.innerHTML = statuses.map((s,i)=>counts[i]>0?`<div style="display:flex;align-items:center;gap:5px"><div style="width:10px;height:10px;border-radius:50%;background:${colors[i]};flex-shrink:0"></div><span style="color:#5a6072">${s}</span><strong style="margin-left:auto;padding-left:8px">${counts[i]}</strong></div>`:'').filter(Boolean).join('');
+    }
+    donutEl._chart = new Chart(donutEl, {
+      type: 'doughnut',
+      data: { labels: statuses, datasets: [{ data: counts, backgroundColor: colors, borderWidth: 2, borderColor: '#fff' }] },
+      options: { cutout: '65%', plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' ' + ctx.label + ': ' + ctx.parsed + ' (' + Math.round(ctx.parsed/total*100) + '%)' } } }, animation: { duration: 600 } }
+    });
+  }
+
+  const barEl = document.getElementById('pipeline-bar');
+  if(barEl && !barEl._chart){
+    const stages = ['Lead','Proposal','Onboarding','Active','Completed'];
+    const counts2 = stages.map(s => APP.data.clients.filter(c=>c.status===s&&!c.archived).length);
+    const bcolors = ['#1B2A4A','#C9A84C','#2A7F7F','#1a7a45','#8892a4'];
+    barEl._chart = new Chart(barEl, {
+      type: 'bar',
+      data: { labels: stages, datasets: [{ data: counts2, backgroundColor: bcolors, borderRadius: 5, borderSkipped: false }] },
+      options: { plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ' Count: ' + ctx.parsed.y } } }, scales: { x: { grid: { display: false }, ticks: { font: { size: 10 } } }, y: { grid: { color: '#E2E6F0' }, ticks: { stepSize: 1, font: { size: 10 } }, beginAtZero: true } }, animation: { duration: 500 } }
+    });
+  }
+
+  const devEl = document.getElementById('device-bar');
+  if(devEl && !devEl._chart){
+    devEl._chart = new Chart(devEl, {
+      type: 'bar',
+      data: { labels: ['Mobile','Desktop'], datasets: [{ data: [30, 57], backgroundColor: ['#2A7F7F','#1B2A4A'], borderRadius: 3, borderSkipped: false }] },
+      options: { plugins: { legend: { display: false }, tooltip: { enabled: false } }, scales: { x: { grid: { display: false }, ticks: { font: { size: 9 } } }, y: { display: false, beginAtZero: true } }, animation: { duration: 400 }, responsive: false }
+    });
+  }
 }
 
 function renderFinance(){
@@ -1336,17 +1526,61 @@ function renderContent(){
   const pending = APP.data.content.filter(c=>c.status==='pending'&&!c.archived);
   const approved = APP.data.content.filter(c=>c.status==='approved'&&!c.archived);
   const revision = APP.data.content.filter(c=>c.status==='revision'&&!c.archived);
+  const allContent = APP.data.content.filter(c=>!c.archived);
+  const now = new Date();
+  const dateFrom = new Date(now.getFullYear(), now.getMonth()-6, 1).toISOString().split('T')[0];
+  const dateTo = new Date(now.getFullYear(), now.getMonth()+2, 0).toISOString().split('T')[0];
+  const platformIcons = {'Facebook':'🟦','Instagram':'🟣','LinkedIn':'🔷','Twitter':'🐦','TikTok':'⬛'};
   return `
-  <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px">
+  <div class="sp-header">
+    <div class="sp-platform-filter">
+      <div class="sp-platform-btn on">All Platforms</div>
+      <div class="sp-platform-btn">🟦 Facebook</div>
+      <div class="sp-platform-btn">🟣 Instagram</div>
+      <div class="sp-platform-btn">🔷 LinkedIn</div>
+    </div>
+    <div class="sp-date-range">📅 ${dateFrom} → ${dateTo}</div>
+    <div class="sp-view-toggle" style="margin-left:auto">
+      <div class="sp-view-btn on">☰ List</div>
+      <div class="sp-view-btn">📅 Calendar</div>
+    </div>
+    <button class="btn btn-sm btn-primary" onclick="openAddContent()">+ New Post</button>
+  </div>
+  <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
     <span class="tag t-red">${pending.length} Pending</span>
     <span class="tag t-green">${approved.length} Approved</span>
     <span class="tag t-amber">${revision.length} Revision</span>
-    <button class="btn btn-sm btn-primary" style="margin-left:auto" onclick="openAddContent()">+ Add Content</button>
+    <span class="tag t-navy">${allContent.length} Total Posts</span>
+  </div>
+  <div class="card" style="margin-bottom:16px">
+    <div style="padding:8px 12px;background:var(--bg);border-bottom:1px solid var(--border);display:flex;gap:10px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">
+      <div style="flex:3">Caption / Title</div>
+      <div style="flex:1">Platform</div>
+      <div style="flex:1">Status</div>
+      <div style="flex:1">Due Date</div>
+      <div style="flex:1">Assigned VA</div>
+    </div>
+    ${allContent.length ? allContent.map(c=>{
+      const platIcon = c.platform&&c.platform.includes('Instagram')?'🟣':c.platform&&c.platform.includes('LinkedIn')?'🔷':'🟦';
+      const statusTag2 = c.status==='pending'?'t-red':c.status==='approved'?'t-green':'t-amber';
+      return `<div class="sp-content-row" onclick="${c.status==='pending'?`openApprovalDetail('${c.id}')`:'void(0)'}">
+        <div class="sp-platform-icon" style="background:${c.status==='pending'?'var(--red-pale)':c.status==='approved'?'var(--green-pale)':'var(--amber-pale)'}">${platIcon}</div>
+        <div style="flex:3;min-width:0"><div style="font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.title}</div></div>
+        <div style="flex:1;font-size:11px;color:var(--text3)">${c.platform||'—'}</div>
+        <div style="flex:1"><span class="tag ${statusTag2}" style="font-size:9px">${c.status}</span></div>
+        <div style="flex:1;font-size:11px;color:var(--text3)">${c.dueLabel||'—'}</div>
+        <div style="flex:1;display:flex;align-items:center;gap:5px"><div class="av av-xs ${avColor(c.vaColor||'navy')}">${c.vaInitials}</div><span style="font-size:11px">${c.vaName}</span></div>
+      </div>`;
+    }).join('') : `<div style="padding:32px;text-align:center;color:var(--text3)">
+      <div style="font-size:32px;margin-bottom:8px">✏️</div>
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">No posts found</div>
+      <div style="font-size:12px">Find all your social media posts in this section</div>
+      <button class="btn btn-primary" style="margin-top:14px" onclick="openAddContent()">+ New Post</button>
+    </div>`}
   </div>
   ${pending.length?`<div class="sec-head"><div class="sec-title" style="color:var(--red)">Pending Approval</div></div>${pending.map(c=>approvalCardHtml(c)).join('')}`:''}
   ${revision.length?`<div class="sec-head" style="margin-top:14px"><div class="sec-title" style="color:var(--amber)">Revision Requested</div></div>${revision.map(c=>approvalCardHtml(c,true)).join('')}`:''}
-  ${approved.length?`<div class="sec-head" style="margin-top:14px"><div class="sec-title" style="color:var(--green)">Approved</div></div>${approved.map(c=>`<div class="card card-pad" style="margin-bottom:8px;opacity:.8;border-left:3px solid var(--green)"><div style="font-size:13px;font-weight:600">${c.title}</div><div style="font-size:11px;color:var(--text3);margin-top:3px"><div class="av av-xs ${avColor(c.vaColor||'navy')}" style="display:inline-flex;margin-right:4px">${c.vaInitials}</div>${c.vaName} · ${c.platform} <span class="tag t-green" style="margin-left:4px">Approved ✓</span></div></div>`).join('')}`:''}
-  ${pending.length===0&&revision.length===0?`<div class="card card-pad" style="text-align:center;color:var(--green);font-weight:600;font-size:14px;padding:24px">✓ All content reviewed!</div>`:''}`;
+  ${pending.length===0&&revision.length===0&&allContent.length>0?`<div style="margin-top:10px;padding:12px 16px;background:var(--green-pale);border-radius:var(--r2);color:var(--green);font-weight:600;font-size:13px;text-align:center">✓ All content reviewed!</div>`:''}`;
 }
 
 function renderInvoices(){
@@ -2656,6 +2890,100 @@ async function openInvoiceDetail(id){
   const paid = PAYMENT_ENGINE.totalPaidForInvoice(invoice.id);
   const outstanding = PAYMENT_ENGINE.outstandingForInvoice(invoice);
   openModal(invoice.number,`<div class="info-grid"><div class="info-box"><div class="info-label">Client</div><div class="info-val">${invoice.client}</div></div><div class="info-box"><div class="info-label">Status</div><div class="info-val"><span class="tag ${invoiceTag(invoice.status)}">${invoice.status}</span></div></div><div class="info-box"><div class="info-label">Amount</div><div class="info-val currency-usd" style="font-size:18px">${money(invoice.amountUsd)}</div></div><div class="info-box"><div class="info-label">Paid</div><div class="info-val" style="color:var(--green)">${money(paid)}</div></div><div class="info-box"><div class="info-label">Outstanding</div><div class="info-val" style="color:${outstanding?'var(--red)':'var(--green)'}">${money(outstanding)}</div></div><div class="info-box"><div class="info-label">Due Date</div><div class="info-val">${invoice.dueDate||'—'}</div></div></div>`,`${outstanding>0?`<button class="btn btn-primary" onclick="markPaid('${invoice.id}');closeModal()">Mark as Paid</button><button class="btn btn-secondary" onclick="openAddPayment('${invoice.clientId}','${invoice.id}')">Add Partial Payment</button>`:''}<button class="btn btn-secondary" onclick="closeModal()">Close</button>`);
+}
+
+function renderConversations(){
+  const convs = APP.data.conversations || [];
+  const activeId = APP.convActive || (convs[0]&&convs[0].id);
+  const active = convs.find(c=>c.id===activeId) || convs[0];
+  if(!convs.length){
+    return `<div class="card" style="padding:48px;text-align:center;color:var(--text3)">
+      <div style="font-size:40px;margin-bottom:12px">💬</div>
+      <div style="font-size:15px;font-weight:600;margin-bottom:6px">No conversations yet</div>
+      <div style="font-size:12px">Conversations with clients and contacts will appear here.</div>
+    </div>`;
+  }
+  return `<div class="conv-layout">
+    <div class="conv-list">
+      <div class="conv-list-head">
+        Team Inbox
+        <span class="tag t-navy">${convs.reduce((a,c)=>a+(c.unread||0),0)} unread</span>
+      </div>
+      ${convs.map(c=>`
+      <div class="conv-thread${c.id===activeId?' on':''}" onclick="selectConv('${c.id}')">
+        <div class="av av-sm ${avColor(c.contactColor||'navy')}">${c.contactInitials}</div>
+        <div class="conv-thread-info">
+          <div class="conv-thread-name">${c.contact}</div>
+          <div class="conv-thread-preview">${c.preview}</div>
+        </div>
+        <div class="conv-thread-meta">
+          <div class="conv-thread-date">${c.date}</div>
+          ${c.unread>0?`<div class="conv-unread">${c.unread}</div>`:''}
+        </div>
+      </div>`).join('')}
+    </div>
+    <div class="conv-main">
+      <div class="conv-main-head">
+        <div class="av av-md ${avColor(active.contactColor||'navy')}">${active.contactInitials}</div>
+        <div>
+          <div style="font-size:14px;font-weight:600">${active.contact}</div>
+          <div style="font-size:11px;color:var(--text3)">Client Contact</div>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <button class="btn btn-sm btn-secondary">⭐</button>
+          <button class="btn btn-sm btn-secondary">📧</button>
+          <button class="btn btn-sm btn-secondary">🗑️</button>
+        </div>
+      </div>
+      <div class="conv-messages">
+        ${(active.messages||[]).map(m=>`
+        <div class="conv-msg ${m.from==='out'?'out':'in'}">
+          ${m.from==='in'?`<div class="av av-sm ${avColor(active.contactColor||'navy')}">${active.contactInitials}</div>`:''}
+          <div>
+            <div class="conv-msg-bubble">${m.text}</div>
+            <div class="conv-msg-time">${m.time}</div>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div class="conv-input-row">
+        <input class="conv-input" placeholder="Type a message..." id="conv-input-field">
+        <button class="btn btn-primary btn-sm" onclick="sendConvMsg('${active.id}')">Send ↗</button>
+      </div>
+    </div>
+    <div class="conv-sidebar">
+      <div class="conv-sidebar-title">Contact Details</div>
+      <div class="av av-lg ${avColor(active.contactColor||'navy')}" style="margin:0 auto 10px;display:flex">${active.contactInitials}</div>
+      <div style="text-align:center;font-size:13px;font-weight:600;margin-bottom:12px">${active.contact}</div>
+      <div class="conv-detail-row"><span class="conv-detail-label">Status</span><span class="conv-detail-val"><span class="tag t-teal">Active</span></span></div>
+      <div class="conv-detail-row"><span class="conv-detail-label">Owner</span><span class="conv-detail-val">Justine</span></div>
+      <div class="conv-detail-row"><span class="conv-detail-label">Unread</span><span class="conv-detail-val">${active.unread||0}</span></div>
+      <div style="margin-top:14px">
+        <div class="conv-sidebar-title">Actions</div>
+        <button class="btn btn-secondary btn-sm w-full" style="margin-bottom:6px">Assign to VA</button>
+        <button class="btn btn-secondary btn-sm w-full">Add to Contacts</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function selectConv(id){
+  APP.convActive = id;
+  const conv = (APP.data.conversations||[]).find(c=>c.id===id);
+  if(conv) conv.unread = 0;
+  renderCurrentPage();
+  updateSbBadges();
+}
+
+function sendConvMsg(convId){
+  const input = document.getElementById('conv-input-field');
+  if(!input || !input.value.trim()) return;
+  const conv = (APP.data.conversations||[]).find(c=>c.id===convId);
+  if(!conv) return;
+  conv.messages = conv.messages||[];
+  conv.messages.push({from:'out',text:input.value.trim(),time:new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})});
+  conv.preview = input.value.trim();
+  input.value = '';
+  renderCurrentPage();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
