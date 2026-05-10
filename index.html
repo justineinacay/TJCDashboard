@@ -124,13 +124,20 @@ html,body{height:100%;font-family:var(--font);font-size:14px;color:var(--text);b
 .pipe-col{min-width:174px;flex:1}
 .pipe-col-head{display:flex;align-items:center;justify-content:space-between;padding:0 4px 7px;font-size:11px;font-weight:600;color:var(--text2)}
 .pipe-count{width:18px;height:18px;border-radius:50%;font-size:9px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
-.pipe-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:9px;margin-bottom:6px;cursor:pointer;position:relative;transition:all .15s}
+.pipe-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:10px 10px 8px;margin-bottom:6px;cursor:grab;position:relative;transition:box-shadow .15s,border-color .15s,transform .15s;min-height:104px;display:flex;flex-direction:column}
 .pipe-card:hover{box-shadow:var(--shadow);transform:translateY(-1px);border-color:var(--border2)}
+.pipe-card:active{cursor:grabbing}
+.pipe-card.dragging{opacity:.4;transform:none;box-shadow:none}
+.pipe-col.drag-over{background:var(--teal-pale);border-radius:var(--r2);outline:2px dashed var(--teal);outline-offset:-2px}
 .pipe-card-bar{position:absolute;left:0;top:0;bottom:0;width:3px;border-radius:3px 0 0 3px}
-.pipe-card-name{font-size:12px;font-weight:600;padding-left:7px;margin-bottom:2px;line-height:1.3}
-.pipe-card-meta{font-size:10px;color:var(--text3);padding-left:7px;margin-bottom:3px}
-.pipe-card-rate{font-size:11px;font-weight:600;padding-left:7px;margin-bottom:5px}
-.pipe-card-margin{font-size:10px;padding-left:7px;margin-bottom:4px;font-weight:600}
+.pipe-card-name{font-size:12px;font-weight:600;padding-left:9px;margin-bottom:3px;line-height:1.3}
+.pipe-card-meta{font-size:11px;color:var(--text3);padding-left:9px;margin-bottom:3px}
+.pipe-card-rate{font-size:11px;font-weight:600;padding-left:9px;margin-bottom:4px}
+.pipe-card-margin{font-size:11px;padding-left:9px;margin-bottom:4px;font-weight:600}
+.pipe-card-foot{display:flex;align-items:center;justify-content:space-between;padding-left:9px;margin-top:auto}
+.pipe-card-del{position:absolute;top:5px;right:5px;background:none;border:none;cursor:pointer;font-size:12px;color:var(--text3);opacity:0;transition:opacity .15s,background .1s,color .1s;padding:2px 4px;border-radius:4px}
+.pipe-card:hover .pipe-card-del{opacity:1}
+.pipe-card-del:hover{background:var(--red-pale)!important;color:var(--red)!important}
 .pipe-add{border:1.5px dashed var(--border2);border-radius:var(--r);padding:7px;text-align:center;font-size:11px;color:var(--text3);cursor:pointer;transition:all .15s}
 .pipe-add:hover{border-color:var(--teal);color:var(--teal);background:var(--teal-pale)}
 .data-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
@@ -1477,6 +1484,29 @@ function renderActivity(){
   <div class="card">${acts.length?acts.map(a=>activityItemHtml(a)).join(''):emptyState('No activity logged yet.')}</div>`;
 }
 
+function dragCard(e, id){
+  e.dataTransfer.setData('text/plain', id);
+  e.dataTransfer.effectAllowed = 'move';
+  setTimeout(()=>{ const el=e.target.closest('.pipe-card'); if(el) el.classList.add('dragging'); }, 0);
+}
+function dragCardEnd(e){
+  const el = e.target.closest('.pipe-card');
+  if(el) el.classList.remove('dragging');
+  document.querySelectorAll('.pipe-col.drag-over').forEach(c=>c.classList.remove('drag-over'));
+}
+function dropOnStage(e, stage){
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  const id = e.dataTransfer.getData('text/plain');
+  const c = (APP.data.clients||[]).find(x=>x.id===id);
+  if(!c || c.status===stage) return;
+  c.status = stage;
+  lsSave('clients', APP.data.clients);
+  logActivity('🔀','Moved to '+stage,'client',c.name,'teal');
+  renderCurrentPage();
+  toast(c.name+' → '+stage,'success');
+}
+
 function renderClients(){
   const stages = ['Lead','Proposal','Onboarding','Active','Completed'];
   const colors = {Lead:'var(--navy)',Proposal:'var(--gold)',Onboarding:'var(--teal)',Active:'var(--teal)',Completed:'var(--green)'};
@@ -1491,7 +1521,29 @@ function renderClients(){
   </div>
   <div class="pipeline">${stages.map(stage=>{
     const cols = clients.filter(c=>c.status===stage);
-    return `<div class="pipe-col"><div class="pipe-col-head">${stage}<span class="pipe-count" style="background:${bg[stage]};color:${tc[stage]}">${cols.length}</span></div>${cols.map(c=>{const margin=FIN.clientMargin(c);return `<div class="pipe-card" onclick="openClientPortal('${c.id}')" style="position:relative">${c.archived?'<div style="position:absolute;top:4px;right:4px;font-size:9px;color:var(--text3)">archived</div>':''}<div class="pipe-card-bar" style="background:${colors[stage]}"></div><button onclick="event.stopPropagation();deleteClient('${c.id}')" style="position:absolute;top:5px;right:5px;background:none;border:none;cursor:pointer;font-size:13px;color:var(--text3);opacity:0;transition:opacity .15s;padding:2px 4px;border-radius:4px" onmouseenter="this.style.opacity=1;this.style.background='var(--red-pale)';this.style.color='var(--red)'" onmouseleave="this.style.opacity=0;this.style.background='none';this.style.color='var(--text3)'" title="Delete client">🗑</button><div class="pipe-card-name">${c.name}</div><div class="pipe-card-meta">${c.package}${!c.rateUsd?' · TBD':''}</div>${c.rateUsd?`<div class="pipe-card-rate" style="color:${colors[stage]}">$${c.rateUsd}/mo · ₱${FIN.toPhp(c.rateUsd).toLocaleString()}</div>`:''}${margin!==null?`<div class="pipe-card-margin">${FIN.marginBadge(margin)}</div>`:''}<div style="display:flex;align-items:center;justify-content:space-between;padding-left:7px"><div style="display:flex;align-items:center;gap:3px"><div class="av av-xs ${avColor(c.assignedVaColor||'navy')}">${c.assignedVaInitials||'?'}</div><span style="font-size:10px;color:var(--text3)">${(c.assignedVa||'').split(' ')[0]}</span></div>${c.oosCount?`<span class="oos-badge">${c.oosCount} OOS</span>`:''}</div></div>`;}).join('')}<div class="pipe-add" onclick="openAddClientInStage('${stage}')">+ Add</div></div>`;
+    return `<div class="pipe-col" ondragover="event.preventDefault();this.classList.add('drag-over')" ondragleave="this.classList.remove('drag-over')" ondrop="dropOnStage(event,'${stage}')">
+      <div class="pipe-col-head">${stage}<span class="pipe-count" style="background:${bg[stage]};color:${tc[stage]}">${cols.length}</span></div>
+      ${cols.map(c=>{
+        const margin=FIN.clientMargin(c);
+        return `<div class="pipe-card" draggable="true" ondragstart="dragCard(event,'${c.id}')" ondragend="dragCardEnd(event)" onclick="openClientPortal('${c.id}')">
+          <div class="pipe-card-bar" style="background:${colors[stage]}"></div>
+          ${c.archived?'<span style="position:absolute;top:4px;right:22px;font-size:10px;color:var(--text3);font-style:italic">archived</span>':''}
+          <button onclick="event.stopPropagation();deleteClient('${c.id}')" class="pipe-card-del" title="Delete client">🗑</button>
+          <div class="pipe-card-name">${c.name}</div>
+          <div class="pipe-card-meta">${c.package}${!c.rateUsd?' · TBD':''}</div>
+          ${c.rateUsd?`<div class="pipe-card-rate" style="color:${colors[stage]}">$${c.rateUsd}/mo &nbsp;·&nbsp; ₱${FIN.toPhp(c.rateUsd).toLocaleString()}</div>`:'<div class="pipe-card-rate" style="color:var(--text3)">Rate TBD</div>'}
+          ${margin!==null?`<div class="pipe-card-margin">${FIN.marginBadge(margin)}</div>`:'<div class="pipe-card-margin" style="visibility:hidden">—</div>'}
+          <div class="pipe-card-foot">
+            <div style="display:flex;align-items:center;gap:4px">
+              <div class="av av-xs ${avColor(c.assignedVaColor||'navy')}">${c.assignedVaInitials||'?'}</div>
+              <span style="font-size:11px;color:var(--text3)">${(c.assignedVa||'Unassigned').split(' ')[0]}</span>
+            </div>
+            ${c.oosCount?`<span class="oos-badge">${c.oosCount} OOS</span>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+      <div class="pipe-add" onclick="openAddClientInStage('${stage}')">+ Add</div>
+    </div>`;
   }).join('')}</div>
   <div class="sec-head"><div class="sec-title">All Clients</div></div>
   <div class="card">
