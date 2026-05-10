@@ -757,6 +757,13 @@ const SEED = {
     {id:'cv2',contact:'BrandX — Kevin',contactInitials:'BX',contactColor:'navy',preview:'The carousel looks great, approved!',date:'May 6',unread:0,messages:[{from:'in',subject:'Carousel Content Approval',text:'The carousel looks great, approved!',time:'3:41 PM'},{from:'out',subject:'Re: Carousel Content Approval',text:'Wonderful! We will schedule it for this weekend.',time:'4:05 PM'}]},
     {id:'cv3',contact:'Nova Muros',contactInitials:'NM',contactColor:'gold',preview:'Reminder: Your call with Rachel…',date:'Apr 20',unread:1,messages:[{from:'in',subject:'Call Reminder — Rachel @ 2 PM',text:'Reminder: Your call with Rachel is tomorrow at 2 PM.',time:'8:00 AM'}]},
     {id:'cv4',contact:'Chester Cruz',contactInitials:'CC',contactColor:'purple',preview:'Please see the updated proposal.',date:'Apr 16',unread:1,messages:[{from:'out',subject:'Updated Proposal for Review',text:'Hi Chester, here is the proposal we discussed.',time:'9:00 AM'},{from:'in',subject:'Re: Updated Proposal for Review',text:'Please see the updated proposal.',time:'9:30 AM'}]},
+  ],
+  sops: [
+    {id:'sop1',emoji:'📱',title:'Social Media Scheduling SOP',driveUrl:'',steps:['Download content assets from Google Drive','Write caption using approved brand voice guide','Add hashtags from the approved bank','Schedule via Meta Business Suite or Buffer','Screenshot confirmation and add to weekly report']},
+    {id:'sop2',emoji:'📊',title:'Weekly Report Template',driveUrl:'',steps:['Open Weekly Report Google Doc template','Fill in: posts published, engagement, tasks done, next week plan','Get Justine review before sending','Send to client using TJC email template','Log as task completion in OS']},
+    {id:'sop3',emoji:'⏱',title:'SLA & Response Protocol',driveUrl:'',steps:['Respond to all client messages within 4 hours','Log first response time in the task record','If unable to respond, escalate to Grace immediately','Update task status to In Progress upon first action','Notify Justine of any SLA risks before they breach']},
+    {id:'sop4',emoji:'🔑',title:'Client Access & Password Protocol',driveUrl:'',steps:['Never screenshot or share passwords in personal chats','All credentials stored in TJC LastPass vault','Request access from Justine — never ask client directly','Log out of all client accounts after each session','Report any access issues within 1 hour']},
+    {id:'sop5',emoji:'🙏',title:'TJC Values & Faith Guide',driveUrl:'',steps:['Excellence is non-negotiable — represent TJC with pride','Faith-driven: we work as unto the Lord (Col. 3:23)','Respond within 2 hours during work hours','Integrity: never promise what you cannot deliver','Growth mindset: every mistake is a learning opportunity']},
   ]
 };
 
@@ -765,7 +772,7 @@ const APP = {
   profile: null,
   role: 'owner',
   page: 'home',
-  data: { tasks:[],clients:[],timelogs:[],content:[],invoices:[],goals:[],team:[],events:[],activities:[],conversations:[] },
+  data: { tasks:[],clients:[],timelogs:[],content:[],invoices:[],goals:[],team:[],events:[],activities:[],conversations:[],sops:[] },
   convActive: 'cv1',
   spView: 'list',
   spCalMonth: null,
@@ -789,7 +796,8 @@ const PAGE_TITLES = {
   invoices:'Invoice Tracker', team:'Partner Roster',
   goals:'OKR Goals', onboarding:'Onboarding Tracker',
   conversations:'Conversations',
-  vaportal:'Partner Portal', clientportal:'Client Portal'
+  vaportal:'Partner Portal', clientportal:'Client Portal',
+  sops:'SOP Library'
 };
 
 const lsKey = col => 'tjc_v3_' + col;
@@ -825,14 +833,14 @@ function saveConfig(){
 }
 
 function loadAllData(){
-  ['tasks','clients','timelogs','content','invoices','goals','team','events','activities','conversations'].forEach(col => {
+  ['tasks','clients','timelogs','content','invoices','goals','team','events','activities','conversations','sops'].forEach(col => {
     APP.data[col] = lsLoad(col);
   });
   loadConfig();
 }
 
 function nid(col){
-  const prefix = {tasks:'t',clients:'c',timelogs:'l',content:'x',invoices:'i',goals:'g',events:'e',team:'u',activities:'a'}[col] || 'd';
+  const prefix = {tasks:'t',clients:'c',timelogs:'l',content:'x',invoices:'i',goals:'g',events:'e',team:'u',activities:'a',sops:'sop'}[col] || 'd';
   return prefix + Date.now();
 }
 
@@ -1137,6 +1145,7 @@ function buildNav(){
     {page:'onboarding',icon:'onboard',label:'Onboarding'},
     {sect:'Team & Company'},
     {page:'team',icon:'team',label:'Partner Roster'},
+    {page:'sops',icon:'sops',label:'SOP Library'},
     {page:'goals',icon:'goals',label:'OKR Goals'},
     {sect:'Communication'},
     {page:'conversations',icon:'conv',label:'Conversations',badge:'conversations'},
@@ -1161,7 +1170,8 @@ function buildNav(){
     goals:`<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r="2.5" stroke="currentColor" stroke-width="1.2"/><circle cx="7" cy="7" r=".8" fill="currentColor"/></svg>`,
     va:`<svg viewBox="0 0 14 14" fill="none"><rect x="1.5" y="1.5" width="11" height="11" rx="2" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 7l2 2 3-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
     cp:`<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.2" stroke="currentColor" stroke-width="1.2"/><path d="M2 12.5c0-2 2.2-3.5 5-3.5s5 1.5 5 3.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`,
-    conv:`<svg viewBox="0 0 14 14" fill="none"><path d="M2 2h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H5l-3 2V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>`
+    conv:`<svg viewBox="0 0 14 14" fill="none"><path d="M2 2h10a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H5l-3 2V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>`,
+    sops:`<svg viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4.5 4.5h5M4.5 7h5M4.5 9.5h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`
   };
   document.getElementById('sb-nav').innerHTML = ownerNav.map(item => {
     if(item.sect) return '<div class="sb-sect">' + item.sect + '</div>';
@@ -1240,6 +1250,7 @@ function renderCurrentPage(){
     vaportal: renderVAPortal,
     clientportal: renderClientPortal,
     conversations: renderConversations,
+    sops: renderSOPLibrary,
   };
   const fn = pages[APP.page];
   ca.innerHTML = fn ? fn() : '<div class="empty"><div class="empty-text">Page not found.</div></div>';
@@ -1800,7 +1811,7 @@ function renderTasks(){
   <div class="card">
     <table class="data-table">
       <thead><tr><th></th><th>Task</th><th>Assignee</th><th>Priority</th><th>Due Date</th><th>Project</th><th>SLA</th><th></th></tr></thead>
-      <tbody>${shown.map(t=>{const late=t.dueDate&&t.dueDate<td&&!t.done;return `<tr style="background:${late?'#FFF8F8':''}${t.isOos?';border-left:3px solid var(--purple)':''}" onclick="openTaskDetail('${t.id}')"><td onclick="event.stopPropagation();toggleTask('${t.id}')"><div class="chk${t.done?' done':''}"></div></td><td style="font-weight:${t.done?400:500}" class="${t.done?'task-name done':''}">${t.isOos?`<span class="oos-badge">OOS</span> `:''}${t.title}</td><td><div style="display:flex;align-items:center;gap:4px">${t.assigneeInitials?`<div class="av av-xs ${avColor(t.assigneeColor)}">${t.assigneeInitials}</div>`:''}<span style="font-size:11px">${(t.assigneeName||'').split(' ')[0]||'—'}</span></div></td><td>${tagHtml(t.priority)}</td><td style="font-size:11px;color:${late?'var(--red)':'var(--text3)'}">${late?'⚠ Overdue':t.dueDate||'—'}</td><td style="font-size:11px;color:var(--text3)">${t.project||'—'}</td><td>${SLA.badge(t)}</td><td onclick="event.stopPropagation()"><button class="btn-icon" onclick="archiveDoc('tasks','${t.id}','${t.title.slice(0,30)}')" style="opacity:0" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">🗃</button></td></tr>`;}).join('')}</tbody>
+      <tbody>${shown.map(t=>{const late=t.dueDate&&t.dueDate<td&&!t.done;return `<tr style="background:${late?'#FFF8F8':t.requestedByClient?'#FFFDF0':''}${t.isOos?';border-left:3px solid var(--purple)':t.requestedByClient?';border-left:3px solid var(--gold)':''}" onclick="openTaskDetail('${t.id}')"><td onclick="event.stopPropagation();toggleTask('${t.id}')"><div class="chk${t.done?' done':''}"></div></td><td style="font-weight:${t.done?400:500}" class="${t.done?'task-name done':''}">${t.isOos?`<span class="oos-badge">OOS</span> `:''}${t.requestedByClient?`<span class="tag t-amber" style="font-size:9px;margin-right:4px">Client ↑</span>`:''}${t.title}</td><td><div style="display:flex;align-items:center;gap:4px">${t.assigneeInitials?`<div class="av av-xs ${avColor(t.assigneeColor)}">${t.assigneeInitials}</div>`:''}<span style="font-size:11px">${(t.assigneeName||'').split(' ')[0]||'—'}</span></div></td><td>${tagHtml(t.priority)}</td><td style="font-size:11px;color:${late?'var(--red)':'var(--text3)'}">${late?'⚠ Overdue':t.dueDate||'—'}</td><td style="font-size:11px;color:var(--text3)">${t.project||'—'}</td><td>${SLA.badge(t)}</td><td onclick="event.stopPropagation()"><button class="btn-icon" onclick="archiveDoc('tasks','${t.id}','${t.title.slice(0,30)}')" style="opacity:0" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">🗃</button></td></tr>`;}).join('')}</tbody>
     </table>
     ${shown.length===0?emptyState('No tasks in this view.'):''}
   </div>`;
@@ -2128,15 +2139,89 @@ function renderVATabClients(va, myClients){
   return `${myClients.map(c=>`<div class="card" style="margin-bottom:12px"><div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:15px;font-weight:700">${c.name}</div><div style="font-size:11px;color:var(--text3)">${c.package} · $${c.rateUsd}/mo · ₱${FIN.toPhp(c.rateUsd).toLocaleString()}/mo</div></div><span class="tag t-teal">${c.status}</span></div><div style="padding:12px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px;border-bottom:1px solid var(--border)"><div><div class="info-label">Health</div><div class="info-val" style="color:${HEALTH.color(c.healthScore||0)}">${HEALTH.compute(c)}</div></div><div><div class="info-label">SLA Rate</div><div class="info-val">${SLA.complianceRate(APP.data.tasks.filter(t=>t.clientId===c.id))}%</div></div><div><div class="info-label">Open Tasks</div><div class="info-val">${APP.data.tasks.filter(t=>t.clientId===c.id&&!t.done&&!t.archived&&t.assigneeUid===va.id).length}</div></div><div><div class="info-label">OOS Tasks</div><div class="info-val" style="color:var(--purple)">${APP.data.tasks.filter(t=>t.clientId===c.id&&t.isOos).length}</div></div></div><div style="padding:12px 16px">${APP.data.tasks.filter(t=>t.clientId===c.id&&t.assigneeUid===va.id&&!t.archived).slice(0,4).map(t=>`<div style="display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--border)" onclick="toggleTask('${t.id}')"><div class="chk${t.done?' done':''}"></div><span style="font-size:12px;flex:1;${t.done?'text-decoration:line-through;color:var(--text3)':''}">${t.isOos?`<span class="oos-badge">OOS</span> `:''}${t.title}</span>${tagHtml(t.priority)}</div>`).join('')}</div></div>`).join('') || emptyState('No active clients assigned.')}`;
 }
 
+function renderSOPCards(sops, showAdmin){
+  return sops.map((s,i)=>`<div class="card" style="margin-bottom:8px">
+    <div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleSOP(${i})">
+      <span style="font-size:20px">${s.emoji||'📋'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600">${s.title}</div>
+        ${s.driveUrl?`<div style="font-size:10px;color:var(--teal);margin-top:2px">Google Drive linked</div>`:`<div style="font-size:10px;color:var(--text3);margin-top:2px">No Drive link yet</div>`}
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        ${s.driveUrl?`<a href="${s.driveUrl}" target="_blank" rel="noopener" class="btn btn-sm btn-teal" style="font-size:11px" onclick="event.stopPropagation()">Open SOP ↗</a>`:''}
+        ${showAdmin?`<button class="btn btn-sm btn-secondary" style="font-size:10px" onclick="event.stopPropagation();openSetSOPDriveUrl('${s.id}')">🔗 ${s.driveUrl?'Edit':'Set'} Link</button>`:''}
+      </div>
+      <svg id="sop-arr-${i}" viewBox="0 0 12 12" fill="none" width="12" height="12" style="flex-shrink:0;transition:transform .2s"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div id="sop-${i}" style="display:none;padding:0 16px 12px">
+      ${s.steps.map((step,si)=>`<div style="display:flex;gap:10px;margin-bottom:8px"><div style="width:20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${si+1}</div><div style="font-size:13px;line-height:1.5">${step}</div></div>`).join('')}
+    </div>
+  </div>`).join('');
+}
+
 function renderVATabSOPs(){
-  const sops = [
-    {emoji:'📱',title:'Social Media Scheduling SOP',steps:['Download content assets from Google Drive','Write caption using approved brand voice guide','Add hashtags from the approved bank','Schedule via Meta Business Suite or Buffer','Screenshot confirmation and add to weekly report']},
-    {emoji:'📊',title:'Weekly Report Template',steps:['Open Weekly Report Google Doc template','Fill in: posts published, engagement, tasks done, next week plan','Get Justine review before sending','Send to client using TJC email template','Log as task completion in OS']},
-    {emoji:'⏱',title:'SLA & Response Protocol',steps:['Respond to all client messages within 4 hours','Log first response time in the task record','If unable to respond, escalate to Grace immediately','Update task status to In Progress upon first action','Notify Justine of any SLA risks before they breach']},
-    {emoji:'🔑',title:'Client Access & Password Protocol',steps:['Never screenshot or share passwords in personal chats','All credentials stored in TJC LastPass vault','Request access from Justine — never ask client directly','Log out of all client accounts after each session','Report any access issues within 1 hour']},
-    {emoji:'🙏',title:'TJC Values & Faith Guide',steps:['Excellence is non-negotiable — represent TJC with pride','Faith-driven: we work as unto the Lord (Col. 3:23)','Respond within 2 hours during work hours','Integrity: never promise what you cannot deliver','Growth mindset: every mistake is a learning opportunity']},
-  ];
-  return sops.map((s,i)=>`<div class="card" style="margin-bottom:8px"><div style="padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="toggleSOP(${i})"><span style="font-size:20px">${s.emoji}</span><div style="flex:1"><div style="font-size:13px;font-weight:600">${s.title}</div></div><svg id="sop-arr-${i}" viewBox="0 0 12 12" fill="none" width="12" height="12" style="flex-shrink:0;transition:transform .2s"><path d="M3 4.5l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div id="sop-${i}" style="display:none;padding:0 16px 12px">${s.steps.map((step,si)=>`<div style="display:flex;gap:10px;margin-bottom:8px"><div style="width:20px;height:20px;border-radius:50%;background:var(--navy);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${si+1}</div><div style="font-size:13px;line-height:1.5">${step}</div></div>`).join('')}</div></div>`).join('');
+  const sops = APP.data.sops||[];
+  return sops.length ? renderSOPCards(sops, false) : '<div style="font-size:13px;color:var(--text3);padding:20px 0">No SOPs yet. Ask management to add them.</div>';
+}
+
+function renderSOPLibrary(){
+  const sops = APP.data.sops||[];
+  return `<div style="max-width:760px;margin:0 auto">
+    <div class="sec-head"><div class="sec-title">SOP Library</div><button class="btn btn-sm btn-primary" onclick="openAddSOP()">+ Add SOP</button></div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px">Click an SOP to expand steps. Use "Set Link" to attach the Google Drive document once your Drive is ready.</div>
+    ${sops.length ? renderSOPCards(sops, true) : '<div class="card card-pad"><div style="color:var(--text3);font-size:13px">No SOPs yet. Add your first standard operating procedure.</div></div>'}
+  </div>`;
+}
+
+function openSetSOPDriveUrl(sopId){
+  const sop = (APP.data.sops||[]).find(s=>s.id===sopId);
+  if(!sop) return;
+  openModal('Set Google Drive Link',
+    `<div class="form-hint">Paste the Google Drive URL for <strong>${sop.title}</strong>. Once set, an "Open SOP" button will appear for your Partners.</div>
+     <div class="form-group"><label class="form-label">Google Drive URL</label><input class="form-control" id="f-sop-url" value="${sop.driveUrl||''}" placeholder="https://docs.google.com/..."></div>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveSOPDriveUrl('${sopId}')">Save Link</button>`
+  );
+}
+
+function saveSOPDriveUrl(sopId){
+  const url = document.getElementById('f-sop-url').value.trim();
+  const sops = APP.data.sops||[];
+  const sop = sops.find(s=>s.id===sopId);
+  if(!sop) return;
+  sop.driveUrl = url;
+  lsSave('sops', sops);
+  closeModal();
+  renderCurrentPage();
+  toast('Drive link saved!');
+}
+
+function openAddSOP(){
+  openModal('Add SOP',
+    `<div class="form-row"><div class="form-group"><label class="form-label">Emoji</label><input class="form-control" id="f-sop-emoji" value="📋" style="width:70px"></div><div class="form-group"><label class="form-label">Title *</label><input class="form-control" id="f-sop-title" placeholder="e.g. Client Onboarding Checklist"></div></div>
+     <div class="form-group"><label class="form-label">Steps (one per line) *</label><textarea class="form-control" id="f-sop-steps" rows="6" placeholder="Step 1&#10;Step 2&#10;Step 3"></textarea></div>
+     <div class="form-group"><label class="form-label">Google Drive URL (optional — can add later)</label><input class="form-control" id="f-sop-url2" placeholder="https://docs.google.com/..."></div>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveAddSOP()">Add SOP</button>`
+  );
+}
+
+async function saveAddSOP(){
+  const title = document.getElementById('f-sop-title').value.trim();
+  const steps = document.getElementById('f-sop-steps').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  if(!title||!steps.length){ toast('Title and at least one step are required.','error'); return; }
+  const sop = {
+    id: 'sop'+Date.now(),
+    emoji: document.getElementById('f-sop-emoji').value.trim()||'📋',
+    title,
+    driveUrl: document.getElementById('f-sop-url2').value.trim(),
+    steps
+  };
+  APP.data.sops.push(sop);
+  lsSave('sops', APP.data.sops);
+  closeModal();
+  renderCurrentPage();
+  toast('SOP added!');
 }
 
 function renderClientPortal(){ return !APP.cp.clientId ? renderCPSelect() : renderCPDetail(); }
@@ -3967,6 +4052,79 @@ function clientLogout(){
 }
 function setClientTab(t){ APP.cpTab=t; renderCurrentPage(); }
 
+function openClientTaskRequest(clientId){
+  const c = APP.data.clients.find(x=>x.id===clientId);
+  if(!c) return;
+  openModal('Request a Task',
+    `<div class="form-hint">Submit a task request to the TJC team. We'll review and assign it within 1 business day.</div>
+     <div class="form-group"><label class="form-label">What do you need done? *</label><input class="form-control" id="f-req-title" placeholder="e.g. Update our Instagram bio, Design a new banner..."></div>
+     <div class="form-group"><label class="form-label">Details / Description</label><textarea class="form-control" id="f-req-desc" rows="3" placeholder="Any context, references, or specific requirements..."></textarea></div>
+     <div class="form-row">
+       <div class="form-group"><label class="form-label">Priority</label><select class="form-control" id="f-req-priority"><option>Low</option><option selected>Medium</option><option>High</option></select></div>
+       <div class="form-group"><label class="form-label">Needed by (optional)</label><input type="date" class="form-control" id="f-req-due"></div>
+     </div>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" onclick="saveClientTaskRequest('${clientId}')">Submit Request</button>`
+  );
+}
+
+async function saveClientTaskRequest(clientId){
+  const title = document.getElementById('f-req-title').value.trim();
+  if(!title){ toast('Please describe what you need done.','error'); return; }
+  const c = APP.data.clients.find(x=>x.id===clientId);
+  await addDoc('tasks',{
+    title,
+    description: document.getElementById('f-req-desc').value.trim(),
+    priority: document.getElementById('f-req-priority').value,
+    dueDate: document.getElementById('f-req-due').value||'',
+    clientId,
+    assigneeUid: c?.assignedVaUid||'',
+    status: 'Requested',
+    done: false,
+    archived: false,
+    requestedByClient: true,
+    _actAction:'submitted a task request',_actIcon:'📋',_actColor:'teal',_actRecord:c?.name||clientId
+  });
+  closeModal();
+  toast('Task request submitted! The TJC team will review it shortly.');
+  renderCurrentPage();
+}
+
+function clientApproveDeliverable(clientId, idx){
+  const c = APP.data.clients.find(x=>x.id===clientId);
+  if(!c||!c.deliverables[idx]) return;
+  c.deliverables[idx].status = 'Approved';
+  c.deliverables[idx].approvedAt = today();
+  updateDoc('clients', clientId, {deliverables: c.deliverables, _actAction:'approved a deliverable',_actIcon:'✅',_actColor:'green',_actRecord:c.deliverables[idx].name});
+  toast('Deliverable approved — thank you!');
+  renderCurrentPage();
+}
+
+function clientRequestRevision(clientId, idx){
+  const c = APP.data.clients.find(x=>x.id===clientId);
+  if(!c||!c.deliverables[idx]) return;
+  openModal('Request a Revision',
+    `<div class="form-hint">Let us know what you'd like changed and we'll get right on it.</div>
+     <div class="form-group"><label class="form-label">Revision Notes *</label><textarea class="form-control" id="f-rev-note" rows="4" placeholder="e.g. Please change the font color to navy blue and update the tagline to..."></textarea></div>`,
+    `<button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+     <button class="btn btn-primary" style="background:var(--red);border-color:var(--red)" onclick="saveRevisionRequest('${clientId}',${idx})">Submit Revision</button>`
+  );
+}
+
+function saveRevisionRequest(clientId, idx){
+  const note = document.getElementById('f-rev-note').value.trim();
+  if(!note){ toast('Please describe what needs to be revised.','error'); return; }
+  const c = APP.data.clients.find(x=>x.id===clientId);
+  if(!c||!c.deliverables[idx]) return;
+  c.deliverables[idx].status = 'Revision Requested';
+  c.deliverables[idx].revisionNote = note;
+  c.deliverables[idx].revisionAt = today();
+  updateDoc('clients', clientId, {deliverables: c.deliverables, _actAction:'requested a revision',_actIcon:'↩️',_actColor:'amber',_actRecord:c.deliverables[idx].name});
+  closeModal();
+  toast('Revision request sent — the team will follow up soon.');
+  renderCurrentPage();
+}
+
 /* ─────────────────────────────────────────────────────────────────
    CLIENT-FACING PORTAL (visible only to authenticated clients)
 ───────────────────────────────────────────────────────────────── */
@@ -4031,17 +4189,31 @@ function renderClientFacingPortal(){
   }
 
   if(APP.cpTab==='tasks'){
+    const myRequests = myTasks.filter(t=>t.requestedByClient);
+    const assignedTasks = myTasks.filter(t=>!t.requestedByClient);
     body = `
-    <div class="sec-head"><div class="sec-title">All My Tasks</div><div style="display:flex;gap:6px"><span class="tag t-red">${overdue.length} overdue</span><span class="tag t-navy">${openTasks.length} open</span><span class="tag t-green">${myTasks.filter(t=>t.done).length} done</span></div></div>
+    <div class="sec-head"><div class="sec-title">My Tasks</div><div style="display:flex;align-items:center;gap:6px"><span class="tag t-red">${overdue.length} overdue</span><span class="tag t-navy">${openTasks.length} open</span><span class="tag t-green">${myTasks.filter(t=>t.done).length} done</span><button class="btn btn-sm btn-primary" onclick="openClientTaskRequest('${c.id}')">+ Request a Task</button></div></div>
+    ${myRequests.length?`<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:8px">Your Requests</div>
+    <div class="card" style="margin-bottom:16px">
+      ${myRequests.map(t=>`<div class="task-row">
+        <div class="chk${t.done?' done':''}"></div>
+        <span class="task-name${t.done?' done':''}">${t.title}</span>
+        <div class="task-meta">
+          ${t.dueDate?`<span style="font-size:11px;color:${t.dueDate<td&&!t.done?'var(--red)':'var(--text3)'}">${t.dueDate}</span>`:''}
+          <span class="tag ${t.done?'t-green':t.status==='In Progress'?'t-teal':'t-amber'}" style="font-size:10px">${t.done?'Done':t.status||'Requested'}</span>
+        </div>
+      </div>`).join('')}
+    </div>`:''}
+    ${assignedTasks.length?`<div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:8px">Assigned by TJC</div>`:''}
     <div class="card">
-      ${myTasks.length ? myTasks.map(t=>`<div class="task-row${t.dueDate&&t.dueDate<td&&!t.done?' overdue-row':''}">
+      ${assignedTasks.length ? assignedTasks.map(t=>`<div class="task-row${t.dueDate&&t.dueDate<td&&!t.done?' overdue-row':''}">
         <div class="chk${t.done?' done':''}"></div>
         <span class="task-name${t.done?' done':''}">${t.title}</span>
         <div class="task-meta">
           ${t.dueDate?`<span style="font-size:11px;color:${t.dueDate<td&&!t.done?'var(--red)':'var(--text3)'}">${t.dueDate}</span>`:''}
           ${t.done?'<span class="tag t-green" style="font-size:10px">Done</span>':''}
         </div>
-      </div>`).join('') : '<div class="empty"><div class="empty-text">No tasks assigned to your account</div></div>'}
+      </div>`).join('') : '<div class="empty"><div class="empty-text">No tasks assigned by the TJC team yet.</div></div>'}
     </div>`;
   }
 
@@ -4063,17 +4235,37 @@ function renderClientFacingPortal(){
   }
 
   if(APP.cpTab==='content'){
+    const delivs = c.deliverables||[];
+    const pendingCount = delivs.filter(d=>['Pending','Draft'].includes(d.status||'Draft')).length;
+    const approvedCount = delivs.filter(d=>d.status==='Approved').length;
     body = `
-    <div class="sec-head"><div class="sec-title">Approved Deliverables</div><span class="tag t-green">${myContent.length} approved</span></div>
+    <div class="sec-head"><div class="sec-title">Deliverables</div><div style="display:flex;gap:6px">${pendingCount?`<span class="tag t-amber">${pendingCount} awaiting review</span>`:''}<span class="tag t-green">${approvedCount} approved</span></div></div>
+    ${pendingCount?`<div style="background:var(--gold-pale);border:1px solid rgba(201,168,76,.3);border-radius:var(--r);padding:10px 14px;margin-bottom:14px;font-size:12px;color:var(--gold-dark)">📬 You have ${pendingCount} deliverable${pendingCount!==1?'s':''} waiting for your review. Approve or request a revision below.</div>`:''}
     <div class="card">
-      ${myContent.length ? myContent.map(ct=>{
-        const plats=postPlatforms(ct);
-        const imgUrl=drivePreviewUrl(ct.imageUrl);
-        return `<div style="display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border)">
-          ${imgUrl?`<img src="${imgUrl}" style="width:44px;height:44px;border-radius:6px;object-fit:cover;background:var(--border)" onerror="this.style.display='none'">`:`<div style="width:44px;height:44px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:18px">📄</div>`}
-          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${ct.title}</div><div style="font-size:11px;color:var(--text3)">${plats.map(p=>platIcon(p)).join(' ')} ${ct.scheduleDate||ct.dueLabel||'—'}</div></div>
-          <span class="tag t-green">Approved</span>
-        </div>`;}).join('') : '<div class="empty"><div class="empty-text">No approved deliverables yet — check back soon!</div></div>'}
+      ${delivs.length ? delivs.map((d,i)=>{
+        const isPending = ['Pending','Draft'].includes(d.status||'Draft');
+        const isRevision = d.status==='Revision Requested';
+        const typeIcon = {Report:'📊',Design:'🎨',Video:'🎬',Copy:'✍️',Presentation:'📽️'}[d.type]||'📦';
+        return `<div style="padding:12px 14px;border-bottom:1px solid var(--border)">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;background:var(--navy-pale)">${typeIcon}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:13px;font-weight:600">${d.name}</div>
+              <div style="display:flex;gap:6px;align-items:center;margin-top:3px;flex-wrap:wrap">
+                <span class="tag t-navy" style="font-size:9px">${d.type||'Other'}</span>
+                <span class="tag ${d.status==='Approved'?'t-green':isRevision?'t-red':isPending?'t-amber':'t-gray'}">${d.status||'Draft'}</span>
+                ${d.date?`<span style="font-size:10px;color:var(--text3)">${d.date}</span>`:''}
+                ${d.url?`<a href="${d.url}" target="_blank" style="font-size:10px;color:var(--teal)">🔗 View file</a>`:''}
+              </div>
+            </div>
+          </div>
+          ${isPending?`<div style="display:flex;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+            <button class="btn btn-sm btn-primary" onclick="clientApproveDeliverable('${c.id}',${i})">✓ Approve</button>
+            <button class="btn btn-sm btn-secondary" style="color:var(--red);border-color:var(--red)" onclick="clientRequestRevision('${c.id}',${i})">↩ Request Revision</button>
+          </div>`:''}
+          ${isRevision&&d.revisionNote?`<div style="margin-top:8px;padding:8px;background:var(--red-pale);border-radius:6px;font-size:11px;color:var(--red)">Revision note: ${d.revisionNote}</div>`:''}
+        </div>`;
+      }).join('') : '<div class="empty"><div class="empty-text">No deliverables shared yet — check back soon!</div></div>'}
     </div>`;
   }
 
