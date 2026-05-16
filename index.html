@@ -2556,6 +2556,7 @@ function sendVAMessage(vaId, thread){
 
 function renderVATabDash(va, myTasks, myOpen, myOverdue, myClients, todayMins, kpiScore, slaRate, oosCount){
   const h=Math.floor(todayMins/60),m=todayMins%60;
+  const todaySecs = APP.data.timelogs.filter(l=>l.vaUid===va.id&&l.date===today()).reduce((a,l)=>a+(l.minutes||0)*60+(l.seconds||0),0);
   const timer = APP.va.taskTimer;
   const timerCard = timer ? `
     <div class="card card-pad" style="margin-bottom:14px;border:2px solid var(--teal);background:var(--teal-pale)">
@@ -2576,7 +2577,7 @@ function renderVATabDash(va, myTasks, myOpen, myOverdue, myClients, todayMins, k
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px">
 <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--text)">${myOpen.length}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">Open Tasks</div></div>
 <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:${myOverdue.length?'var(--red)':'var(--green)'}">${myOverdue.length}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">Overdue</div></div>
-<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--teal)">${h}h ${m}m</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">Today's Time</div></div>
+<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--teal)">${fmtDurationFromSecs(todaySecs)}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">Today's Time</div></div>
 <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:${KPI.tierColor(kpiScore)}">${kpiScore}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">KPI Score</div></div>
 <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:${slaRate>=90?'var(--green)':slaRate>=75?'var(--gold-dark)':'var(--red)'}">${slaRate}%</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em">SLA Rate</div></div>
 </div>
@@ -2656,9 +2657,18 @@ function renderVATabTimelog(va, myLogs, td, todayMins){
 
   return `
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px">
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--teal)">${Math.floor(todayMins/60)}h ${todayMins%60}m</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Today</div></div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--text)">${Math.floor(weekMins/60)}h</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">This Week</div></div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center"><div style="font-size:20px;font-weight:700;color:var(--gold-dark)">${myLogs.length}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase">Total Entries</div></div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center">
+      <div style="font-size:18px;font-weight:700;color:var(--teal)">${fmtDurationFromSecs(myLogs.filter(l=>l.date===td).reduce((a,l)=>a+(l.minutes||0)*60+(l.seconds||0),0))}</div>
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:3px">Today</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center">
+      <div style="font-size:18px;font-weight:700;color:var(--text)">${fmtDurationFromSecs(myLogs.filter(l=>l.date>=getWeekStart()).reduce((a,l)=>a+(l.minutes||0)*60+(l.seconds||0),0))}</div>
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:3px">This Week</div>
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r2);padding:12px;text-align:center">
+      <div style="font-size:18px;font-weight:700;color:var(--gold-dark)">${myLogs.length}</div>
+      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;margin-top:3px">Total Entries</div>
+    </div>
   </div>
   ${onBreak?`<div class="break-banner" id="break-banner"><div class="break-banner-text">☕ On break — resumes in <span id="break-countdown">${bm}:${bs}</span></div><button class="break-timer-btn" onclick="endBreakEarly()">End Break Early</button></div>`:''}
   <div class="card card-pad" style="margin-bottom:14px">
@@ -2668,14 +2678,27 @@ function renderVATabTimelog(va, myLogs, td, todayMins){
     <div class="form-group"><label class="form-label">What are you working on? *</label><input class="form-control" id="timer-desc" placeholder="e.g. Scheduled BrandX Week 18 posts"></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">Client / Project</label><select class="form-control" id="timer-project"><option value="">— Select —</option>${APP.data.clients.filter(c=>c.assignedVaUid===va.id&&c.status==='Active').map(c=>`<option value="${c.id}|${c.name}">${c.name}</option>`).join('')}<option value="">Internal</option><option value="">Admin</option></select></div>
-      <div class="form-group"><label class="form-label">Or log manually (minutes)</label><input type="number" class="form-control" id="timer-manual" placeholder="e.g. 45"></div>
+      <div class="form-group"><label class="form-label">Manual entry</label>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="number" class="form-control" id="timer-manual" placeholder="0" min="0" style="text-align:center">
+          <span style="font-size:12px;color:var(--text3);flex-shrink:0">min</span>
+          <input type="number" class="form-control" id="timer-secs" placeholder="0" min="0" max="59" style="text-align:center">
+          <span style="font-size:12px;color:var(--text3);flex-shrink:0">sec</span>
+        </div>
+      </div>
     </div>
     <button class="btn btn-primary w-full" onclick="logTime('${va.id}')">📋 Log Time Entry</button>
   </div>
   <div class="sec-head"><div class="sec-title">Time Log History</div></div>
   <div class="card">
     <table class="data-table"><thead><tr><th>Date</th><th>Description</th><th>Project</th><th style="text-align:right">Duration</th><th style="width:24px"></th></tr></thead>
-    <tbody>${myLogs.slice().reverse().map(l=>`<tr><td style="font-size:11px;color:var(--text3)">${l.date}</td><td style="font-size:12px">${l.description||'—'}</td><td style="font-size:11px;color:var(--text3)">${l.project||'—'}</td><td style="text-align:right;font-weight:600;font-size:12px">${Math.floor((l.minutes||0)/60)}h ${(l.minutes||0)%60}m</td><td><button class="btn-icon" onclick="archiveDoc('timelogs','${l.id}','${(l.description||'Log').slice(0,20)}')" style="opacity:0" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">🗃</button></td></tr>`).join('')}</tbody>
+    <tbody>${myLogs.slice().reverse().map(l=>`<tr>
+      <td style="font-size:11px;color:var(--text3)">${l.date}</td>
+      <td style="font-size:12px">${l.description||'—'}</td>
+      <td style="font-size:11px;color:var(--text3)">${l.project||'—'}</td>
+      <td style="text-align:right;font-weight:600;font-size:12px;white-space:nowrap">${fmtDuration(l.minutes||0,l.seconds||0)}</td>
+      <td><button class="btn-icon" onclick="archiveDoc('timelogs','${l.id}','${(l.description||'Log').slice(0,20)}')" style="opacity:0" onmouseenter="this.style.opacity=1" onmouseleave="this.style.opacity=0">🗃</button></td>
+    </tr>`).join('')}</tbody>
     </table>${myLogs.length===0?emptyState('No time entries yet.'):''}
   </div>`;
 }
@@ -3623,6 +3646,27 @@ function fmtElapsed(secs){
   return `${h}:${m}:${s}`;
 }
 
+/* fmtDuration — always shows h m s, used everywhere time is displayed */
+function fmtDuration(minutes, seconds){
+  const totalSecs = (minutes||0)*60 + (seconds||0);
+  const h = Math.floor(totalSecs/3600);
+  const m = Math.floor((totalSecs%3600)/60);
+  const s = totalSecs%60;
+  if(h>0) return `${h}h ${m}m ${s}s`;
+  if(m>0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
+/* fmtDurationFromSecs — takes raw seconds total */
+function fmtDurationFromSecs(totalSecs){
+  const h=Math.floor(totalSecs/3600);
+  const m=Math.floor((totalSecs%3600)/60);
+  const s=totalSecs%60;
+  if(h>0) return `${h}h ${m}m ${s}s`;
+  if(m>0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
 function updateFloatingTimer(){
   const pill = document.getElementById('floating-timer');
   if(!pill) return;
@@ -3724,17 +3768,29 @@ function updateBreakBanner(){
 
 async function logTime(vaId){
   const desc=document.getElementById('timer-desc')?document.getElementById('timer-desc').value.trim():'';
-  const manual=document.getElementById('timer-manual')?parseInt(document.getElementById('timer-manual').value)||0:0;
-  const timerMins=Math.floor(APP.timer.elapsed/60);
-  const minutes=manual||timerMins;
-  if(!minutes||minutes<=0){ toast('Run the timer or enter minutes manually.','error'); return; }
   if(!desc){ toast('Please describe what you worked on.','error'); return; }
   const projVal=document.getElementById('timer-project')?document.getElementById('timer-project').value:'';
   const proj=projVal.split('|');
   const va=APP.data.team.find(v=>v.id===vaId);
-  await addDoc('timelogs',{vaUid:vaId,vaName:va?.displayName||'',vaInitials:va?.initials||'',date:today(),description:desc,clientId:proj[0]||null,project:proj[1]||proj[0]||'',minutes,archived:false,_actAction:`logged ${Math.floor(minutes/60)}h ${minutes%60}m`,_actIcon:'⏱',_actColor:'navy',_actRecord:desc.slice(0,40)});
+
+  let minutes=0, seconds=0;
+  if(APP.timer.elapsed>0){
+    // Use live timer — full precision in seconds
+    minutes=Math.floor(APP.timer.elapsed/60);
+    seconds=APP.timer.elapsed%60;
+  } else {
+    // Manual entry
+    minutes=parseInt(document.getElementById('timer-manual')?.value)||0;
+    seconds=parseInt(document.getElementById('timer-secs')?.value)||0;
+  }
+
+  const totalSecs = minutes*60+seconds;
+  if(totalSecs<=0){ toast('Run the timer or enter a duration manually.','error'); return; }
+
+  const label = fmtDuration(minutes,seconds);
+  await addDoc('timelogs',{vaUid:vaId,vaName:va?.displayName||'',vaInitials:va?.initials||'',date:today(),description:desc,clientId:proj[0]||null,project:proj[1]||proj[0]||'',minutes,seconds,archived:false,_actAction:`logged ${label}`,_actIcon:'⏱',_actColor:'navy',_actRecord:desc.slice(0,40)});
   resetTimer();
-  toast(`Logged ${Math.floor(minutes/60)}h ${minutes%60}m — great work! 🎉`,'success');
+  toast(`Logged ${label} — great work! 🎉`,'success');
 }
 
 function taskRowHtml(t){
@@ -5605,8 +5661,9 @@ function renderVAWeeklySummary(va, myTasks, myLogs){
   const weekStart = new Date(now); weekStart.setDate(now.getDate()-now.getDay()+1); weekStart.setHours(0,0,0,0);
   const weekStr = weekStart.toISOString().split('T')[0];
   const weekLogs = myLogs.filter(l=>l.date>=weekStr);
-  const weekMins = weekLogs.reduce((a,l)=>a+(l.minutes||0),0);
-  const weekH = Math.floor(weekMins/60), weekM = weekMins%60;
+  const weekTotalSecs = weekLogs.reduce((a,l)=>a+(l.minutes||0)*60+(l.seconds||0),0);
+  const weekMins = Math.floor(weekTotalSecs/60), weekM = weekTotalSecs%60;
+  const weekH = Math.floor(weekTotalSecs/3600);
   const weekDone = myTasks.filter(t=>t.done&&t.completedAt&&t.completedAt>=weekStr).length;
   const weekOverdue = myTasks.filter(t=>!t.done&&t.dueDate&&t.dueDate>=weekStr&&t.dueDate<today()).length;
   const oos = myTasks.filter(t=>t.isOos&&!t.done);
@@ -5625,7 +5682,7 @@ function renderVAWeeklySummary(va, myTasks, myLogs){
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:0">
       ${[
         ['Tasks Done',weekDone,'','var(--green)'],
-        ['Hours Logged',weekH+'h '+weekM+'m','','var(--teal)'],
+        ['Hours Logged',fmtDurationFromSecs(weekTotalSecs),'','var(--teal)'],
         ['KPI Score',kpi,'',kpi>=90?'var(--green)':kpi>=75?'var(--gold)':'var(--red)'],
         ['SLA Rate',sla+'%','',sla>=90?'var(--green)':sla>=75?'var(--gold)':'var(--red)'],
         ['EOD Streak',eodStreak+'d','streak','var(--gold)'],
@@ -5655,18 +5712,22 @@ function startTaskTimer(taskId, taskTitle, vaId){
 
 function stopTaskTimer(vaId, silent){
   if(!APP.va.taskTimer) return;
-  const mins = Math.round((Date.now()-APP.va.taskTimer.startedAt)/60000);
+  const totalSecs = Math.floor((Date.now()-APP.va.taskTimer.startedAt)/1000);
   const t = APP.va.taskTimer;
   APP.va.taskTimer = null;
-  if(mins < 1){ if(!silent) toast('Timer stopped (less than 1 min — not logged).',''); renderCurrentPage(); return; }
+  if(totalSecs < 1){ if(!silent) toast('Timer stopped (under 1 second — not logged).',''); renderCurrentPage(); return; }
+  const mins = Math.floor(totalSecs/60);
+  const secs = totalSecs%60;
   APP.data.timelogs.push({
     id:'tl-task-'+Date.now(), vaUid:vaId,
     taskId:t.taskId, taskTitle:t.title,
-    date:today(), minutes:mins,
-    note:'Auto-logged via task timer'
+    description:t.title, date:today(),
+    minutes:mins, seconds:secs,
+    note:'Auto-logged via task timer',
+    archived:false
   });
   lsSave('timelogs', APP.data.timelogs);
-  if(!silent) toast('⏱ '+mins+'m logged for: '+t.title.slice(0,30),'success');
+  if(!silent) toast(`⏱ ${fmtDuration(mins,secs)} logged for: ${t.title.slice(0,30)}`,'success');
   renderCurrentPage();
 }
 
@@ -5774,7 +5835,7 @@ function renderVAEODReport(va){
   const reports = vaLS('eod', va.id);
   const todayReport = reports.find(r=>r.date===td);
   const d = APP.va.eodDraft||{};
-  const autoH = (()=>{const logs=APP.data.timelogs.filter(l=>l.vaUid===va.id&&l.date===td);return (logs.reduce((a,l)=>a+(l.minutes||0),0)/60).toFixed(1);})();
+  const autoH = (()=>{const logs=APP.data.timelogs.filter(l=>l.vaUid===va.id&&l.date===td);const ts=logs.reduce((a,l)=>a+(l.minutes||0)*60+(l.seconds||0),0);return fmtDurationFromSecs(ts);})();
 
   return `<div style="max-width:720px;margin:0 auto">
     <div class="sec-head">
